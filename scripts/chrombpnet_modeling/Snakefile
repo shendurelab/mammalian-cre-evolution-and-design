@@ -1,0 +1,411 @@
+# Generate bam files for each cell type
+# @author Tony
+
+# usually I run this by requesting an interactive session in a screen
+# with like: qlogin -l mfree=10G -l h_rt=32:00:00
+# # then I check that it's all working with
+# snakemake -np | less
+# # then if that's good I run the submission script:
+# ./sm_script.sh
+# can also set how many you want to make in one pass by
+# subsetting lists in the input rule
+
+import os, sys, pickle, re, glob
+from collections import defaultdict
+import pandas as pd
+os.system('mkdir -p slurm_files ; ')
+BASE_PATH = '/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet'
+BAM_PATH = '/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/data/scATAC_bams/10x_bams'
+CACTUS_GENOME_PATH = '/net/shendure/vol8/projects/tli/ucsc_cactus/genomes'
+CACTUS_GENOME_SZE_PATH = '/net/shendure/vol8/projects/tli/ucsc_cactus/genome_sizes'
+SUBSET_BAM_TOOL="/net/gs/vol1/home/tli824/bin/software/subset-bam_linux"
+TESTED_MPRA_BED="/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/cactus_CREs/data/tested_devCRE_positions_v2_mEB_MPRA_20220627.bed"
+GENE_BED="/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/plot_regions/position_devCRE_loci_extended.bed"
+### set utilities paths
+KENT_UTILS="/net/gs/vol1/home/tli824/bin/software/kentUtils/bin"
+
+
+## list barcodes
+BC_FILE = BASE_PATH + '/cellBC_to_celltype_table_scATAC_mEB_20230201.txt'
+bc_df = pd.read_csv(BC_FILE, sep = '\t')
+bc_df = bc_df[bc_df['coarse_cluster'] != 'TBD']
+# gets available cell types and sorts for consistency
+coarse_clusters = bc_df['coarse_cluster'].unique()
+defined_clusters = bc_df['refined_cluster'].unique()
+bc_df[['replicate','barcode']] = bc_df['cellBC'].str.split('#',expand=True)
+bc_df[['frag','replicate']] = bc_df['replicate'].str.split('_',expand=True)
+replicates = bc_df['replicate'].unique()
+
+rule all:
+    input:
+        expand(BASE_PATH + '/{cluster}.sorted.bam',
+            cluster = coarse_clusters),
+        expand(BASE_PATH + '/macs2/{cluster}_peaks.narrowPeak',
+            cluster = coarse_clusters),
+        expand(BASE_PATH + '/macs2/overlaps/overlap.peaks.resolved.500.bed')
+        #expand(BASE_PATH + '/heldout_predictions/{cluster}/{cluster}_chrombpnet_nobias.bw',
+        #    cluster = coarse_clusters),
+        #expand(BASE_PATH + '/heldout_predictions/{cluster}/{cluster}_pred.bed',
+        #    cluster = coarse_clusters),
+        #expand(BASE_PATH + '/tss_predictions/{cluster}/{cluster}_chrombpnet_nobias.bw',
+        #    cluster = coarse_clusters),
+        #expand(BASE_PATH + '/tf_modisico/{cluster}_modisco.h5',
+        #    cluster = coarse_clusters),
+        #expand(BASE_PATH + '/tf_footprints/{cluster}/{cluster}_footprints.h5',
+        #    cluster = coarse_clusters),
+
+
+# this rule generates bam files for each cluster at each replicate
+rule generate_coarse_replicate_bams:
+    input:
+        bam=BAM_PATH + '/EBD21_crispri_{replicate}.bam',        
+    output:
+        cell_bam = temp(BASE_PATH + '/{cluster}_{replicate}.bam')
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_cell_replicate_bams", 
+        run_time="48:00:00", cores="4", memory="4", job_name="make_bam_{cluster}_{replicate}"
+    threads: 4
+    shell:
+        """
+        awk '(NR>1)' {BC_FILE} | grep 'fragments_{wildcards.replicate}' | grep -w '{wildcards.cluster}' | awk -v FS="\t" -v OFS="\t" '{{split($1,a,/#/); print a[2]}}' > {wildcards.cluster}_{wildcards.replicate}_BC.tmp ;
+        
+        {SUBSET_BAM_TOOL} -b {input.bam} --cell-barcodes {wildcards.cluster}_{wildcards.replicate}_BC.tmp --cores {params.cores} -o {output.cell_bam} ;
+        rm {wildcards.cluster}_{wildcards.replicate}_BC.tmp ;
+        """
+
+# this rule merge bam files for each cluster
+rule generate_merge_coarse_bams:
+    input:
+        bam_files = expand(BASE_PATH + "/{{cluster}}_{replicate}.bam",replicate = replicates)       
+    output:
+        cell_bam = BASE_PATH + '/{cluster}.sorted.bam'
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_merge_coarse_bams", 
+        run_time="48:00:00", cores="4", memory="4", job_name="merge_{cluster}_bams"
+    threads: 4
+    shell:
+        """
+        samtools merge -@{params.cores} -f {wildcards.cluster}.merged_unsorted.bam {input.bam_files} ;
+        samtools sort -@{params.cores} {wildcards.cluster}.merged_unsorted.bam -o {output.cell_bam} ; 
+        samtools index {output.cell_bam} ; 
+        rm {wildcards.cluster}.merged_unsorted.bam ; 
+        """
+        
+## this rule generates blacklist for filter
+rule generate_mouse_blacklist:
+    input:
+        blacklist = "/net/shendure/vol10/projects/tli/nobackup/enhancer_project/metadata/Blacklist/lists/Blacklist_v2/mm10-blacklist.v2.bed",
+        chromsizes = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.chrom.sizes'
+    output:
+        blacklist_extended = BASE_PATH + '/mm10-blacklist.chrombpnet.bed',
+        subset_chromsizes = BASE_PATH + '/mm10.subset.sizes', 
+        fold_json = BASE_PATH + '/splits/fold_0.json'
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_mouse_blacklist", 
+        run_time="48:00:00", cores="1", memory="4", job_name="generate_mouse_blacklist"
+    threads: 1
+    shell:
+        """
+        source activate chrombpnet ;
+        bedtools slop -i {input.blacklist} -g {input.chromsizes} -b 1057 >  {output.blacklist_extended} ;
+        grep 'chr' {input.chromsizes} | sort | grep -F -v 'random' | grep -F -v 'chrUn' | grep -F -v 'chrM' > {output.subset_chromsizes} ;
+        mkdir -p splits ;
+        chrombpnet prep splits -c {output.subset_chromsizes} -tcr chr1 chr4 chr6 -vcr chr10 chr17 -op splits/fold_0 ;
+        """
+        
+    
+# this rule does peak calling
+rule generate_coarse_peak_calling:
+    input:
+        cell_bam = BASE_PATH + '/{cluster}.sorted.bam',
+    output:
+        peaks = BASE_PATH + '/macs2/{cluster}_peaks.narrowPeak',
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_coarse_peak_calling", 
+        run_time="48:00:00", cores="4", memory="4", job_name="callpeaks_{cluster}"
+    threads: 4
+    shell:
+        """        
+        macs2 callpeak -t {input.cell_bam} -f BAM -n {wildcards.cluster} --outdir macs2 --shift -100 --extsize 200 -p 0.01 -g 1.87e9;
+        """
+
+# this rule does overlapping peak file
+rule generate_overlaps_peaks:
+    input:
+        expand(BASE_PATH + '/macs2/{cluster}_peaks.narrowPeak', cluster = coarse_clusters)
+    output:
+        final_peaks = BASE_PATH + '/macs2/overlaps/overlap.peaks.resolved.500.bed',
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_overlaps_peaks", 
+        run_time="48:00:00", cores="1", memory="4", job_name="generate_overlaps_peaks"
+    threads: 1
+    shell:
+        """
+        mkdir -p {BASE_PATH}/macs2/overlaps ;
+        cd {BASE_PATH}/macs2/overlaps ;
+        cat {input} | sort -k9 -nr | gzip > overlap.peaks.qval.sort.narrowPeak.gz ;
+        zcat overlap.peaks.qval.sort.narrowPeak.gz | awk -v OFS='\t' '{{print $1,$2+$10-250,$2+$10+250}}' | bedsort | bedtools merge > overlap.peaks.merged.bed ;
+        ### resolve peaks
+        python {BASE_PATH}/resolve.py -np overlap.peaks.qval.sort.narrowPeak.gz -o {output.final_peaks} ;
+        """
+
+
+# this rule cleans peaks for blacklist overlaps, and generates bg sets for each cluster
+rule generate_clean_peaks:
+    input:
+        peaks = BASE_PATH + '/macs2/{cluster}_peaks.narrowPeak',
+        blacklist = "/net/shendure/vol10/projects/tli/nobackup/enhancer_project/metadata/Blacklist/lists/Blacklist_v2/mm10-blacklist.v2.bed",
+        blacklist_extended = BASE_PATH + '/mm10-blacklist.chrombpnet.bed',
+        chromsizes = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.chrom.sizes',
+        genome = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.fa',
+        fold_json = BASE_PATH + '/splits/fold_0.json'
+    output:
+        clean_peaks = BASE_PATH + '/input_peaks/{cluster}_peaks_no_blacklist.bed',
+        bg_set = BASE_PATH + '/background_sets/{cluster}_negatives.bed'
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_clean_peaks", 
+        run_time="48:00:00", cores="4", memory="4", job_name="cleanpeaks_{cluster}"
+    threads: 4
+    shell:
+        """
+        source activate chrombpnet ;
+        
+        mkdir -p {BASE_PATH}/input_peaks ;
+        cd {BASE_PATH}/input_peaks ;
+        bedtools intersect -v -a {input.peaks} -b {input.blacklist_extended}  > {wildcards.cluster}.tmp ;
+        ### remove peaks that are tested from JB's MPRA set
+        bedtools intersect -v -a {wildcards.cluster}.tmp -b {TESTED_MPRA_BED} > {output.clean_peaks} ;
+        rm {wildcards.cluster}.tmp ;
+        
+        mkdir -p {BASE_PATH}/background_sets ;
+        cd {BASE_PATH}/background_sets ;
+        chrombpnet prep nonpeaks -g {input.genome} -p {output.clean_peaks} -c {input.chromsizes} -fl {input.fold_json} -br {input.blacklist} -o {BASE_PATH}/background_sets/{wildcards.cluster} ; 
+        """
+
+### make prediction bed file
+rule generate_pred_file:
+    input:
+        chromsizes = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.chrom.sizes'
+    output:
+        pred_bed = temp(BASE_PATH + '/heldout_set.bed')
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_pred_file", 
+        run_time="48:00:00", cores="1", memory="4", job_name="generate_pred_file"
+    threads: 1
+    shell:
+        """ 
+        bedtools makewindows -b <( bedtools slop -i {GENE_BED} -g {input.chromsizes} -b 200000 ) -w 800 -i srcwinnum > gene_body_windows.bed;
+        awk -v FS="\t" -v OFS="\t" '{{print $1,$2,$3,$4,".",".",".",".",".","1057"}}' gene_body_windows.bed > {output.pred_bed} ;
+        rm gene_body_windows.bed ;
+        """
+        
+        
+#### having issues using chrombpnet with snakemake
+#### have to run train_gpu.sh then train_factorized_gpu.sh to train bias and nobias models
+
+### the big daddy prediction ~ probably run on gpus if you can
+rule generate_chrombpnet_predict_all:
+    input:
+        peaks = BASE_PATH + '/macs2/{cluster}_peaks.narrowPeak',
+        bg_set = BASE_PATH + '/background_sets/{cluster}_negatives.bed',
+        bias_model = BASE_PATH + '/bias_models/{cluster}/models/{cluster}_bias.h5',
+        chrom_model = BASE_PATH + '/chrombpnet_models/{cluster}/models/chrombpnet.h5',
+        chrom_nobias_model = BASE_PATH + '/chrombpnet_models/{cluster}/models/chrombpnet_nobias.h5',
+        chromsizes = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.chrom.sizes',
+        genome = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.fa',
+        bigwig = BASE_PATH + '/scATAC_bigwigs/{cluster}-TileSize-50-normMethod-ReadsInTSS-ArchR.bw'
+    output:
+        bw = BASE_PATH + '/all_predictions/{cluster}/{cluster}_chrombpnet_nobias.bw',
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_chrombpnet_predict_all", 
+        run_time="120:00:00", cores="1", memory="100", job_name="cmb_predict_all_{cluster}"
+    threads: 1
+    shell:
+        """
+        source activate chrombpnet ;
+        
+        mkdir -p {BASE_PATH}/all_predictions/{wildcards.cluster} ;
+        cd {BASE_PATH}/all_predictions/{wildcards.cluster} ;
+        cat {input.peaks} {input.bg_set} > {wildcards.cluster}_pred_set.bed ;
+        
+        chrombpnet pred_bw \
+        -r {wildcards.cluster}_pred_set.bed  \
+        -g {input.genome} \
+        -c {input.chromsizes} \
+        -bm {input.bias_model} \
+        -cm {input.chrom_model} \
+        -cmb {input.chrom_nobias_model} \
+        -bw {input.bigwig} \
+        -op {BASE_PATH}/all_predictions/{wildcards.cluster}/{wildcards.cluster} ;
+        """
+
+
+rule generate_chrombpnet_predictions:
+    input:
+        pred_bed = BASE_PATH + '/heldout_set.bed',
+        bias_model = BASE_PATH + '/bias_models/{cluster}/models/{cluster}_bias.h5',
+        chrom_model = BASE_PATH + '/chrombpnet_models/{cluster}/models/chrombpnet.h5',
+        chrom_nobias_model = BASE_PATH + '/chrombpnet_models/{cluster}/models/chrombpnet_nobias.h5',
+        chromsizes = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.chrom.sizes',
+        genome = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.fa',
+        bigwig = BASE_PATH + '/scATAC_bigwigs/{cluster}-TileSize-50-normMethod-ReadsInTSS-ArchR.bw'
+    output:
+        bw = BASE_PATH + '/heldout_predictions/{cluster}/{cluster}_chrombpnet_nobias.bw',
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_chrombpnet_predictions", 
+        run_time="48:00:00", cores="1", memory="64", job_name="cmb_predict_{cluster}"
+    threads: 1
+    shell:
+        """
+        source activate chrombpnet ;
+        
+        mkdir -p {BASE_PATH}/heldout_predictions/{wildcards.cluster} ;
+        
+        chrombpnet pred_bw \
+        -r {input.pred_bed}  \
+        -g {input.genome} \
+        -c {input.chromsizes} \
+        -bm {input.bias_model} \
+        -cm {input.chrom_model} \
+        -cmb {input.chrom_nobias_model} \
+        -bw {input.bigwig} \
+        -op {BASE_PATH}/heldout_predictions/{wildcards.cluster}/{wildcards.cluster} ;
+        """
+
+rule generate_chrombpnet_TSSpredictions:
+    input:
+        tss_bed = '/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/data/mTSS_bed_file_20220710.adjusted.bed',
+        bias_model = BASE_PATH + '/bias_models/{cluster}/models/{cluster}_bias.h5',
+        chrom_model = BASE_PATH + '/chrombpnet_models/{cluster}/models/chrombpnet.h5',
+        chrom_nobias_model = BASE_PATH + '/chrombpnet_models/{cluster}/models/chrombpnet_nobias.h5',
+        subset_chromsizes = BASE_PATH + '/mm10.subset.sizes',
+        genome = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.fa',
+        bigwig = BASE_PATH + '/scATAC_bigwigs/{cluster}-TileSize-50-normMethod-ReadsInTSS-ArchR.bw'
+    output:
+        bw = BASE_PATH + '/tss_predictions/{cluster}/{cluster}_chrombpnet_nobias.bw',
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_chrombpnet_TSSpredictions", 
+        run_time="48:00:00", cores="1", memory="64", job_name="cmb_TSSpredict_{cluster}"
+    threads: 1
+    shell:
+        """
+        source activate chrombpnet ;
+        
+        mkdir -p {BASE_PATH}/tss_predictions/{wildcards.cluster} ;
+        cd {BASE_PATH}/tss_predictions/{wildcards.cluster} ;
+        
+        awk -v FS="\t" -v OFS="\t" '{{print $1,$2,$3,$4,".",".",".",".",".","1057"}}' {input.tss_bed} > {wildcards.cluster}.tmp.bed ;
+        
+        chrombpnet pred_bw \
+        -r {wildcards.cluster}.tmp.bed  \
+        -g {input.genome} \
+        -c {input.subset_chromsizes} \
+        -bm {input.bias_model} \
+        -cm {input.chrom_model} \
+        -cmb {input.chrom_nobias_model} \
+        -op {BASE_PATH}/heldout_predictions/{wildcards.cluster}/{wildcards.cluster} ;
+        
+        awk -v FS="\t" -v OFS="\t" '{{print $1,$2,$3,$4"|"NR}}' {input.tss_bed} > {wildcards.cluster}.tmp.bed ;
+        {KENT_UTILS}/bigWigAverageOverBed -bedOut={wildcards.cluster}_nobias_TSSprediction.bed {output.bw} {wildcards.cluster}.tmp.bed /dev/null ;
+        rm {wildcards.cluster}.tmp.bed ;
+        """
+
+rule score_heldout:
+    input:
+        bw = BASE_PATH + '/heldout_predictions/{cluster}/{cluster}_chrombpnet_nobias.bw',
+        pred_bed = BASE_PATH + '/heldout_set.bed'
+    output:
+        pred_acc=BASE_PATH + '/heldout_predictions/{cluster}/{cluster}_pred.bed'
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/score_heldout", 
+        run_time="48:00:00", cores="1", memory="64", job_name="score_heldout_{cluster}"
+    threads: 1
+    shell:
+        """
+        {KENT_UTILS}/bigWigAverageOverBed -bedOut={output.pred_acc} {input.bw} <( awk -v FS="\t" -v OFS="\t" '{{print $1,$2,$3,$4}}' {input.pred_bed} ) /dev/null ;
+        """
+
+rule generate_chrombpnet_contrib_score:
+    input:
+        chrom_nobias_model = BASE_PATH + '/chrombpnet_models/{cluster}/models/chrombpnet_nobias.h5',
+        chromsizes = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.chrom.sizes',
+        genome = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.fa',
+    output:
+        contrib_score = BASE_PATH + '/contrib_scores/{cluster}.profile_scores.h5',
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_chrombpnet_contrib_score", 
+        run_time="999:00:00", cores="1", memory="64", job_name="cmb_scoreSeq_{cluster}"
+    threads: 1
+    shell:
+        """
+        source activate chrombpnet ;
+        
+        mkdir -p {BASE_PATH}/contrib_scores/ ;
+        cd {BASE_PATH}/contrib_scores/ ;
+        grep '{wildcards.cluster}' {TESTED_MPRA_BED} | awk -v FS="\t" -v OFS="\t" '{{print $1,$2,$3,$4,".",".",".",".",".","1057"}}' > {wildcards.cluster}_contrib_input.bed ;
+        
+        chrombpnet contribs_bw \
+        -r {wildcards.cluster}_contrib_input.bed  \
+        -g {input.genome} \
+        -c {input.chromsizes} \
+        -m {input.chrom_nobias_model} \
+        -op {BASE_PATH}/contrib_scores/{wildcards.cluster} ;
+        
+        rm {wildcards.cluster}_contrib_input.bed ;
+        """
+        
+rule generate_denovo_motif_discovery:
+    input:
+        contrib_score = BASE_PATH + '/contrib_scores/{cluster}.profile_scores.h5',
+    output:
+        bw = BASE_PATH + '/tf_modisico/{cluster}_modisco.h5',
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_denovo_motif_discovery", 
+        run_time="120:00:00", cores="1", memory="64", job_name="tfmodisico_{cluster}"
+    threads: 1
+    shell:
+        """
+        source activate chrombpnet ;
+        
+        mkdir -p {BASE_PATH}/tf_modisico/ ;
+        
+        chrombpnet modisco_motifs \
+        -i {input.contrib_score}  \
+        -n 50000 \
+        -op {BASE_PATH}/tf_modisico/{wildcards.cluster} ;
+        """
+        
+rule generate_tf_footprinting:
+    input:
+        chrom_nobias_model = BASE_PATH + '/chrombpnet_models/{cluster}/models/chrombpnet_nobias.h5',
+        chromsizes = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.chrom.sizes',
+        genome = '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.fa',
+        motifs=BASE_PATH + "/EBmotif_to_pwm.TF.tsv",
+        bg_set = BASE_PATH + '/background_sets/{cluster}_negatives.bed',
+        fold_json = BASE_PATH + '/splits/fold_0.json'
+    output:
+        fp = BASE_PATH + '/tf_footprints/{cluster}/{cluster}_footprints.h5',
+    params:
+        error_out_file=BASE_PATH + "/slurm_files/generate_tf_footprinting", 
+        run_time="120:00:00", cores="1", memory="100", job_name="TF_FP_{cluster}"
+    threads: 1
+    shell:
+        """
+        source activate chrombpnet ;
+        
+        mkdir -p {BASE_PATH}/tf_footprints/{wildcards.cluster} ;
+        cd {BASE_PATH}/tf_footprints/{wildcards.cluster} ;
+        shuf -n 30000 {input.bg_set} > {wildcards.cluster}_negatives_subset30k.bed ;
+        
+        chrombpnet footprints \
+            -r {wildcards.cluster}_negatives_subset30k.bed  \
+            -m {input.chrom_nobias_model} \
+            -g {input.genome} \
+            -fl {input.fold_json} \
+            -op {BASE_PATH}/tf_footprints/{wildcards.cluster}/{wildcards.cluster} \
+            -pwm_f {input.motifs}
+        
+        python {BASE_PATH}/realign_footprints.py --h5_file {output.fp} -op {wildcards.cluster} ;
+        
+        rm {wildcards.cluster}_negatives_subset30k.bed ;
+        """

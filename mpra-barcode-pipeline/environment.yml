@@ -1,0 +1,29 @@
+name: mpra-pipeline
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  # CLI tools
+  - bowtie2
+  - samtools
+  - pear
+  # Python
+  - python>=3.6
+  - pysam
+  - biopython
+  # R
+  - r-base>=4.3
+  - r-dplyr
+  - r-tidyverse
+  - r-ggplot2
+  - r-cowplot
+  - r-reshape2
+  - r-gtools
+  - r-patchwork
+  - r-stringr
+  - r-ggrastr
+  - r-desctools
+  - r-castor
+  - r-ape
+  - r-phytools

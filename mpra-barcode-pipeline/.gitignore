@@ -1,0 +1,9 @@
+output/
+input/
+bt_idx/
+*.fastq.gz
+*.bam
+*.bai
+*.h5
+__pycache__/
+.ipynb_checkpoints/
