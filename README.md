@@ -6,8 +6,8 @@ Code and data to reproduce the analyses and figures from our two companion studi
 
 ## Papers
 
-1. **Evolution**: evolutionary dynamics of CREs across 241 mammalian species, using cactus multi-species alignments, phyloP conservation, chromBPNet predictions of accessibility, and MPRA measurements across orthologous CREs.
-2. **Design**: in silico CRE design (oCRE, pCRE, compact CRE libraries) guided by chromBPNet marginal footprinting and ProBound TFBS affinities, validated by MPRA in mouse embryoid body cell types (pluri, ecto, meso, endo/ParEndo).
+1. Functional plasticity and tunability in the evolution of mammalian cis-regulatory elements
+2. Multi-scale dissection, compaction and derivatization of mammalian developmental enhancers
 
 ## Repository layout
 
