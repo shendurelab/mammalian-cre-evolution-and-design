@@ -17,8 +17,8 @@ mammalian-cre-evolution-and-design/
 ├── extdata/                    # Pre-computed R binary data for figure scripts
 ├── imgs/                       # Phylogenetic tree images
 ├── scripts/
-│   ├── make_figure1.R … make_figure5.R          # Main figures
-│   ├── make_supp_figure*.R, make_ext_data_fig1.R # Supplementary figures
+│   ├── make_figure1.R … make_figure5.R          # Main figures (paper 1)
+│   ├── make_supp_figure*.R, make_ext_data_fig1.R # Supplementary figures (paper 1)
 │   ├── utils/                  # Shared plotting, analysis, tree, MSA helpers
 │   ├── cactus_liftover/        # Ortholog extraction from 241-way mammalian cactus
 │   ├── oligo_design/           # Synthetic CRE library design
@@ -31,7 +31,7 @@ mammalian-cre-evolution-and-design/
 
 ## What's in each directory
 
-- **`scripts/make_figure*.R`** – R scripts that regenerate each figure panel from files in `data/` and `extdata/`. Shared helpers live in `scripts/utils/`.
+- **`scripts/make_figure*.R`** – R scripts that regenerate the main and supplementary figure panels **for paper 1** (the evolution paper), from files in `data/` and `extdata/`. Shared helpers live in `scripts/utils/`. Figure scripts for paper 2 will be added as the manuscript is finalized.
 - **`mpra-barcode-pipeline/`** – Configured for the PYS2 oCREv2 MPRA. Takes raw FASTQs → BC-CRE dictionary → BC quantification → per-CRE activity. See [`mpra-barcode-pipeline/README.md`](mpra-barcode-pipeline/README.md).
 - **`scripts/oligo_design/`** – Generates the synthetic CRE sequences tested in MPRA, using a trained chromBPNet model. See [`scripts/oligo_design/README.md`](scripts/oligo_design/README.md).
 - **`scripts/chrombpnet_modeling/`** – Trains cell-type-specific chromBPNet models from mEB scATAC-seq used by the oligo-design scripts. See [`scripts/chrombpnet_modeling/README.md`](scripts/chrombpnet_modeling/README.md).
