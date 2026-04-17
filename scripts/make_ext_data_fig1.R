@@ -1007,7 +1007,7 @@ library(htmltools)
 tables <- readHTMLTable(file.path(FIG_DATA, 'endo_modisco_motifs.html')) %>% as.data.frame()
 colnames(tables) <- sub("^NULL\\.", "", colnames(tables))
 
-motifs <- read_meme(file.path(FIG_DATA, 'CIS-BP_Mus_musculus.meme'))
+motifs <- read_meme(file.path(DATA_DIR, 'motif_databases', 'CIS-BP_Mus_musculus.meme'))
 motif_table <- data.frame(
   name = sapply(motifs, function(m) m@name),
   altname = sapply(motifs, function(m) m@altname),

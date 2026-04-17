@@ -117,6 +117,10 @@ Rscript 06_analyze_mpra.R \
     plots/
 ```
 
+## Data availability
+
+Raw **subassembly** sequencing FASTQs for the PYS2 oCREv2 MPRA (Step 2 input; dictionary construction) are deposited in GEO under accession **[GSE328309](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE328309)**. Download them into the `DICT_FASTQ_DIR` location configured in `config.sh` before running the pipeline. MPRA expression FASTQs (Step 4) are not part of this GEO submission.
+
 ## Input file formats
 
 ### CRE FASTA (`CRE_FASTA`)

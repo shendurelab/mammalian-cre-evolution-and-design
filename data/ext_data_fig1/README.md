@@ -10,7 +10,7 @@ Inputs consumed by `scripts/make_ext_data_fig1.R`, organized for reproducibility
 - `overlap.peaks.resolved.500.filtered_cmb_peaks.bed` — non-overlapping 500 bp consensus peak set across the four mEB cell types, used to sample background regions when computing bigwig track ymax values.
 - `mm10_biomart_GeneExport.txt` — Ensembl/BioMart gene export, used to filter refGene transcripts to protein-coding loci for the Gviz `GeneRegionTrack`.
 - `endo_modisco_motifs.html` — TF-MoDISco motif discovery report (endoderm model), parsed for the per-motif `num_seqlets` count displayed in `ext_data_fig4.pdf`.
-- `CIS-BP_Mus_musculus.meme` — CIS-BP v2.00 *Mus musculus* motif MEME file, used only to map MoDISco `match*` IDs to human-readable TF names.
+- The CIS-BP v2.00 *Mus musculus* motif MEME file (used for mapping MoDISco `match*` IDs to TF names) lives in the shared location `data/motif_databases/CIS-BP_Mus_musculus.meme` since it is reused by other figure scripts.
 
 ### `consensus_peak_preds/`
 Per-cell observed vs predicted log-count tables for the consensus peak set. Prepared from the large chromBPNet prediction HDF5 files (`predictions/logcounts` column only) by `scripts/utils/preprocess_ext_data_fig1_h5.R`.

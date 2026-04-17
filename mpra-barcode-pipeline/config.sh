@@ -4,6 +4,11 @@
 # ============================================================================
 # Customized for the PYS2 oCREv2 / CRE trajectory MPRA experiment.
 # All pipeline scripts source this file.
+#
+# Raw subassembly FASTQs (Step 2 input) are available from GEO accession
+# GSE328309: https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE328309
+# Download them into the DICT_FASTQ_DIR location below.
+# MPRA expression FASTQs (Step 4) are not part of this GEO submission.
 # ============================================================================
 
 # --- Genome / references ---

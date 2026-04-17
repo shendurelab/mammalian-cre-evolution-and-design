@@ -22,12 +22,12 @@ library(gtools)
 library(ggstar)
 library(purrr)
 library(IRanges)
-source("/net/shendure/vol8/projects/tli/PYS2_oCRE_BC_libs_20240904/mpra_tablemaker.R")
-source("/net/shendure/vol8/projects/tli/PYS2_oCRE_BC_libs_20240904/make_tree_functions.R")
-source("/net/shendure/vol8/projects/tli/PYS2_oCRE_BC_libs_20240904/trajectory_utils.R")
-source("/net/shendure/vol8/projects/tli/PYS2_oCRE_BC_libs_20240904/figure2_func.R")
-source("/net/shendure/vol8/projects/tli/PYS2_oCRE_BC_libs_20240904/make_tree_functions.R")
-source("/net/shendure/vol8/projects/tli/PYS2_oCRE_BC_libs_20240904/load_figure1_2_data.R")
+source("utils/mpra_tablemaker.R")
+source("utils/make_tree_functions.R")
+source("utils/trajectory_utils.R")
+# figure1_func.R and figure2_func.R are identical, so we reuse figure1_func.R
+source("utils/figure1_func.R")
+source("utils/load_figure1_2_data.R")
 
 # Helper function to safely pull a value or return 0
 pull_or_zero <- function(df, col) {
