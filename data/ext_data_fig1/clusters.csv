@@ -1,0 +1,5 @@
+﻿cluster,colour,description,bigwig,pred_bigwig
+endo,#e66100,endoderm,/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet/merged_bigwigs/endo.bw,/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet/chrombpnet_overlap_peaks/peaks_prediction/endo_chrombpnet_nobias.bw
+meso,#009e73,mesoderm,/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet/merged_bigwigs/meso.bw,/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet/chrombpnet_overlap_peaks/peaks_prediction/meso_chrombpnet_nobias.bw
+ecto,#dc3220,ectoderm,/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet/merged_bigwigs/ecto.bw,/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet/chrombpnet_overlap_peaks/peaks_prediction/ecto_chrombpnet_nobias.bw
+pluri,#006cd1,ESC,/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet/merged_bigwigs/pluri.bw,/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet/chrombpnet_overlap_peaks/peaks_prediction/pluri_chrombpnet_nobias.bw
