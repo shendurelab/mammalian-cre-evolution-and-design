@@ -33,12 +33,16 @@ import concurrent.futures
 # -----------------------------------------------------------------------------
 # Paths
 # -----------------------------------------------------------------------------
-# Small inputs ship next to this script under data/.
-# Two large inputs (mm10 fasta, chromBPNet nobias model) are NOT shipped;
-# set MM10_FASTA and CHROMBPNET_NOBIAS_MODEL in the environment, or edit
-# the defaults below.
+# Most inputs ship with the repo:
+#   CRE tile FASTA             : scripts/oligo_design/pCREs_v2/data/
+#   fold_0.json, bg regions    : scripts/oligo_design/compact_optimization/data/
+#   endo chromBPNet nobias h5  : data/chrombpnet_models/endo/chrombpnet_nobias.h5
+#
+# One large input (mm10 FASTA) is NOT shipped; set $MM10_FASTA to its path.
+# Override $CHROMBPNET_NOBIAS_MODEL to swap in a different model.
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, 'data')
+REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..'))
 # reuse CRE tile FASTA that already ships with pCREs_v2
 CRE_FASTA = os.path.join(
     SCRIPT_DIR, '..', 'pCREs_v2', 'data',
@@ -53,7 +57,8 @@ MM10_FASTA = os.environ.get(
 )
 CHROMBPNET_NOBIAS_MODEL = os.environ.get(
     'CHROMBPNET_NOBIAS_MODEL',
-    '/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet/chrombpnet_models/endo/models/chrombpnet_nobias.h5',
+    os.path.join(REPO_ROOT, 'data', 'chrombpnet_models', 'endo',
+                 'chrombpnet_nobias.h5'),
 )
 OUTPUT_TSV = os.environ.get('OUTPUT_TSV', 'compact_marginal_fp.txt')
 

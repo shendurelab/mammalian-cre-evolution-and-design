@@ -25,7 +25,7 @@ sequence_align
 ### Data files
 
 All scripts depend on:
-- **chromBPNet model**: `EB_chrombpnet/chrombpnet_models/endo/models/chrombpnet_nobias.h5`
+- **chromBPNet model**: `data/chrombpnet_models/endo/chrombpnet_nobias.h5` (included in this repo)
 - **mm10 genome**: `/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.fa`
 - **Fold splits**: `EB_chrombpnet/splits/fold_0.json`
 - **Background regions**: `cactus_CREs/bg_beds/endo_negatives_10ksubset.bed` (negative genomic regions for normalizing marginal footprints)

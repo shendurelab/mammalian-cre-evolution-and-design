@@ -15,8 +15,8 @@ Inputs (all resolved relative to REPO_ROOT):
     data/ext_data_fig2cd/all_oCRE_cactusv2_reoriented_20240417_pwm.txt
     data/ext_data_fig2cd/tfbs_tables/Epas1_oCRE_func_TFBS_mapping.txt
     data/ext_data_fig2cd/tfbs_tables/Rattus_norvegicus_Gata4_CRE_func_TFBS_mapping.txt
-    data/ext_data_fig2cd/chrombpnet_models/endo/endo_bias.h5
-    data/ext_data_fig2cd/chrombpnet_models/endo/chrombpnet_nobias.h5
+    data/chrombpnet_models/endo/endo_bias.h5
+    data/chrombpnet_models/endo/chrombpnet_nobias.h5
     data/mouse_TFBS_impact_and_affinity_CRM.txt
     data/motif_databases/CIS-BP_Mus_musculus.meme
 
@@ -203,8 +203,8 @@ motif_to_family = {
 
 
 # Initialize variables
-bias_model = str(FIG_DATA / "chrombpnet_models" / "endo" / "endo_bias.h5")
-chrombpnet_model = str(FIG_DATA / "chrombpnet_models" / "endo" / "chrombpnet_nobias.h5")
+bias_model = str(DATA_DIR / "chrombpnet_models" / "endo" / "endo_bias.h5")
+chrombpnet_model = str(DATA_DIR / "chrombpnet_models" / "endo" / "chrombpnet_nobias.h5")
 
 model = ChromBPNet.from_chrombpnet(bias_model, chrombpnet_model, 'endo')
 model = model.to(device)
