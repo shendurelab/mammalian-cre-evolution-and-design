@@ -22,13 +22,27 @@ from collections import ChainMap
 import deepdish as dd
 
 #Custom functions
-sys.path.insert(0, f'/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/util_scripts/Brennan_Zelda_2023/analysis/scripts/py')
-from chrombpnet_predict_functions import predict_chrombpnet
+# predict_chrombpnet is sourced from the Brennan_Zelda_2023 companion repo:
+#   https://github.com/zeitlingerlab/Brennan_Zelda_2023/tree/master/analysis/scripts/py
+# Clone that repo and set $BRENNAN_ZELDA_2023_PY to the analysis/scripts/py
+# directory (or edit the fallback path below), so this module can find
+# chrombpnet_predict_functions.py.
+sys.path.insert(0, os.environ.get(
+    'BRENNAN_ZELDA_2023_PY',
+    '/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/util_scripts/Brennan_Zelda_2023/analysis/scripts/py',
+))
+try:
+    from chrombpnet_predict_functions import predict_chrombpnet
+except ImportError:
+    # Downstream callers that only use load_model_wrapper / get_seq can
+    # still import this module without the Brennan_Zelda_2023 helpers.
+    predict_chrombpnet = None
 pd.options.mode.chained_assignment = None  # Disable the warning
 
 #Independent Variables
 BASE_DIR='/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet'
-os.chdir(BASE_DIR)
+if os.path.isdir(BASE_DIR):
+    os.chdir(BASE_DIR)  # kept for backward compatibility; no-op when absent
 INPUT_SEQLEN=2114
 OUTPUT_SEQLEN=1000
 trials = 1000 # 10
@@ -36,8 +50,17 @@ primary_position = 300
 measurement_window_around_motif = 200
 step  = 1
 
-genome_fasta = pyfaidx.Fasta('/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.fa')
+# Default mm10 FASTA; override via $MM10_FASTA.
+_MM10_FASTA = os.environ.get('MM10_FASTA', '/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.fa')
+genome_fasta = pyfaidx.Fasta(_MM10_FASTA) if os.path.exists(_MM10_FASTA) else None
 #Dependent variables
+# Default chromBPNet nobias model ships in the repo at
+# data/chrombpnet_models/endo/chrombpnet_nobias.h5; override via $CHROMBPNET_NOBIAS_MODEL.
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+CHROMBPNET_NOBIAS_MODEL = os.environ.get(
+    'CHROMBPNET_NOBIAS_MODEL',
+    os.path.join(_REPO_ROOT, 'data', 'chrombpnet_models', 'endo', 'chrombpnet_nobias.h5'),
+)
 MODEL_DIR=BASE_DIR + '/chrombpnet_models/endo/models/'
 
 

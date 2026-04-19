@@ -221,15 +221,21 @@ phyloP_scores['CRE'] = ['_'.join(x.split('_')[:-1]) for x in phyloP_scores['name
 
 genome_fasta = pyfaidx.Fasta('/net/gs/vol1/home/tli824/bin/references/mouse/UCSC/mm10/mm10.fa')
 #Dependent variables
-BASE_DIR='/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/EB_chrombpnet'
-MODEL_DIR=BASE_DIR + '/chrombpnet_models/endo/models/'
+# Default chromBPNet nobias model ships in the repo at
+# data/chrombpnet_models/endo/chrombpnet_nobias.h5. Override via
+# $CHROMBPNET_NOBIAS_MODEL to use a different model.
+_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
+CHROMBPNET_NOBIAS_MODEL = os.environ.get(
+    'CHROMBPNET_NOBIAS_MODEL',
+    os.path.join(_REPO_ROOT, 'data', 'chrombpnet_models', 'endo', 'chrombpnet_nobias.h5'),
+)
 
 
 ##################################################################
 # Load model
 ##################################################################
 tf.keras.backend.clear_session()
-model_path = MODEL_DIR + 'chrombpnet_nobias.h5'
+model_path = CHROMBPNET_NOBIAS_MODEL
 model = load_model_wrapper(model_path = model_path)
 INPUT_SEQLEN=2114
 OUTPUT_SEQLEN=1000

@@ -22,6 +22,19 @@ python-Levenshtein
 sequence_align
 ```
 
+### External helper module
+
+`evolvability_optimization/evolvability.py` optionally imports `predict_chrombpnet` from the companion Brennan_Zelda_2023 repo:
+<https://github.com/zeitlingerlab/Brennan_Zelda_2023/tree/master/analysis/scripts/py>
+
+Clone that repo and either set
+
+```bash
+export BRENNAN_ZELDA_2023_PY=/path/to/Brennan_Zelda_2023/analysis/scripts/py
+```
+
+or edit the fallback path inside `evolvability.py`. If the module cannot be imported, `predict_chrombpnet` falls back to `None` — callers that only need `load_model_wrapper` / `get_seq` still work.
+
 ### Data files
 
 All scripts depend on:
@@ -36,7 +49,7 @@ All scripts depend on:
 
 Evaluates the effect of evolutionary mutations on CRE activity using chromBPNet marginal footprinting.
 
-#### `dms_marginal_footprinting_fromJBfa_v2.py`
+#### `dms_marginal_footprinting.py`
 
 **Purpose**: In silico deep mutational scanning (DMS) of mouse CRE tiles. For each 300bp max-activity CRE tile, generates all possible single-nucleotide mutations and predicts their effect on chromatin accessibility using chromBPNet marginal footprinting.
 

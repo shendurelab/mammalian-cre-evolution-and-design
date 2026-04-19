@@ -55,7 +55,7 @@ qsub train_gpu.sh                 # bias models
 qsub train_factorized_gpu.sh      # factorized chromBPNet models
 
 # 4. Regenerate oligo designs (requires trained chromBPNet)
-python scripts/oligo_design/evolvability_optimization/dms_marginal_footprinting_fromJBfa_v2.py
+python scripts/oligo_design/evolvability_optimization/dms_marginal_footprinting.py
 python scripts/oligo_design/compact_optimization/compact_CREs.py
 python scripts/oligo_design/pCREs_v2/shuffleCREFasta_chromTiles.py
 ```
