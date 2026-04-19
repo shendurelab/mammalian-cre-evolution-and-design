@@ -146,11 +146,11 @@ Evaluates the effect of evolutionary mutations on CRE activity using chromBPNet 
 
 ---
 
-### pCREs_v2/
+### derivatization_CRE/
 
 #### `shuffleCREFasta_chromTiles.py`
 
-**Purpose**: Generate permuted CRE (pCRE) oligo libraries by systematically rearranging CRE sequence features. Creates a large combinatorial library of synthetic sequences that test the sufficiency and arrangement of TFBS motifs.
+**Purpose**: Generate derivatized CRE oligo libraries by systematically rearranging CRE sequence features. Creates a large combinatorial library of synthetic sequences that test the sufficiency and arrangement of TFBS motifs.
 
 **How it works**:
 For each CRE tile, generates multiple classes of permuted sequences:
@@ -167,7 +167,7 @@ For each CRE tile, generates multiple classes of permuted sequences:
 - TFBS predictions from ProBound (Gata6, Sox17, Foxa2, Klf4 in ParEndo): `TFBS_ProBound_*_ParEndo_maxTileDMS_20240409.txt`
 - Background sequences: `endo_bg_2k.fa` and previous pCRE v1 backgrounds
 
-**Output**: `JB_tiles_300bp_subtile_shuffled_v4.tsv` (tab-delimited: header, sequence, tile_id)
+**Output**: `tiles_300bp_subtile_shuffled.tsv` (tab-delimited: header, sequence, tile_id)
 
 **Local dependencies**: `SequencePremutationTools.py`
 

@@ -9,7 +9,7 @@ minimal activity loss and is used to design compact synthetic CREs.
 
 This is the same algorithm described in the paper; the script here is
 self-contained: small inputs ship under `data/`, the CRE tile FASTA is
-reused from the neighboring `pCREs_v2/data/` directory, and the two large
+reused from the neighboring `derivatization_CRE/data/` directory, and the two large
 external inputs (the mm10 reference genome and the trained chromBPNet
 model) are supplied via environment variables.
 
@@ -27,7 +27,7 @@ The CRE tile FASTA is **not** copied here — it lives in the sibling pCRE
 library directory and is loaded by relative path:
 
 ```
-scripts/oligo_design/pCREs_v2/data/DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile_20231205.fa
+scripts/oligo_design/derivatization_CRE/data/DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile_20231205.fa
 ```
 
 If that file is moved, update `CRE_FASTA` at the top of `compact_CREs.py`.

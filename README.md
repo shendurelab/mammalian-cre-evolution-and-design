@@ -24,7 +24,7 @@ mammalian-cre-evolution-and-design/
 │   ├── oligo_design/           # Synthetic CRE library design
 │   │   ├── evolvability_optimization/   # DMS + pairwise ancestral SNP rescue
 │   │   ├── compact_optimization/        # Iterative 1bp deletion
-│   │   └── pCREs_v2/                    # TFBS shuffling / reconstitution / deposition
+│   │   └── derivatization_CRE/          # TFBS shuffling / reconstitution / deposition
 │   └── chrombpnet_modeling/    # Cell-type chromBPNet model training from scATAC
 └── mpra-barcode-pipeline/      # End-to-end MPRA BC dictionary + quantification pipeline
 ```
@@ -57,7 +57,7 @@ qsub train_factorized_gpu.sh      # factorized chromBPNet models
 # 4. Regenerate oligo designs (requires trained chromBPNet)
 python scripts/oligo_design/evolvability_optimization/dms_marginal_footprinting.py
 python scripts/oligo_design/compact_optimization/compact_CREs.py
-python scripts/oligo_design/pCREs_v2/shuffleCREFasta_chromTiles.py
+python scripts/oligo_design/derivatization_CRE/shuffleCREFasta_chromTiles.py
 ```
 
 ## Dependencies

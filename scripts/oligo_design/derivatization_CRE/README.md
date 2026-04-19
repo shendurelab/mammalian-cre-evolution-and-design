@@ -14,7 +14,7 @@ the dependencies, and running `python shuffleCREFasta_chromTiles.py`.
 
 | File | Purpose |
 | --- | --- |
-| `shuffleCREFasta_chromTiles.py` | Main driver; produces `JB_tiles_300bp_subtile_shuffled_v4.tsv` in the current working directory. |
+| `shuffleCREFasta_chromTiles.py` | Main driver; produces `tiles_300bp_subtile_shuffled.tsv` in the current working directory. |
 | `SequencePremutationTools.py` | Helper class: dinucleotide-preserving shuffling (Altschul & Erickson Eulerian-path algorithm), interval-aware TFBS extraction, TFBS implantation into backgrounds, random-segment shuffling / thripsis. |
 | `data/DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile_20231205.fa` | Source CRE tiles (mouse 300 bp max-activity subtiles from the DMS screen). |
 | `data/TFBS_ProBound_Gata6_Sox17_Foxa2_Klf4_ParEndo_maxTileDMS_20240409.txt` | ProBound TFBS predictions (Gata6 / Sox17 / Foxa2 / Klf4) in ParEndo on the max-activity DMS tiles. |
@@ -41,7 +41,7 @@ python shuffleCREFasta_chromTiles.py
 ```
 
 Output is written to the current working directory as
-`JB_tiles_300bp_subtile_shuffled_v4.tsv` (three tab-separated columns: header,
+`tiles_300bp_subtile_shuffled.tsv` (three tab-separated columns: header,
 sequence, `tile<index>`).
 
 Reproducibility notes:

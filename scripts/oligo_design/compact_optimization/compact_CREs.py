@@ -34,7 +34,7 @@ import concurrent.futures
 # Paths
 # -----------------------------------------------------------------------------
 # Most inputs ship with the repo:
-#   CRE tile FASTA             : scripts/oligo_design/pCREs_v2/data/
+#   CRE tile FASTA             : scripts/oligo_design/derivatization_CRE/data/
 #   fold_0.json, bg regions    : scripts/oligo_design/compact_optimization/data/
 #   endo chromBPNet nobias h5  : data/chrombpnet_models/endo/chrombpnet_nobias.h5
 #
@@ -43,9 +43,9 @@ import concurrent.futures
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(SCRIPT_DIR, 'data')
 REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..'))
-# reuse CRE tile FASTA that already ships with pCREs_v2
+# reuse CRE tile FASTA that already ships with derivatization_CRE
 CRE_FASTA = os.path.join(
-    SCRIPT_DIR, '..', 'pCREs_v2', 'data',
+    SCRIPT_DIR, '..', 'derivatization_CRE', 'data',
     'DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile_20231205.fa',
 )
 FOLD_JSON = os.path.join(DATA_DIR, 'fold_0.json')

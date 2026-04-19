@@ -195,4 +195,4 @@ for i in range(0,len(bg_list)):
     seq_dict["bg_" + str(i + 1) + "|background_seq"] = bg_list[i].lower()
     seq_dict["shuffled_bg_" + str(i + 1) + "|shuffled_background_seq"] = shuffle_bg_list[i].lower()
 
-create_pwm(seq_dict, 'JB_tiles_300bp_subtile_shuffled_v4.tsv')
+create_pwm(seq_dict, 'tiles_300bp_subtile_shuffled.tsv')
