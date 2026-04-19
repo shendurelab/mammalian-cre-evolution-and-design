@@ -15,7 +15,7 @@ Code and data to reproduce the analyses and figures from our two companion studi
 mammalian-cre-evolution-and-design/
 ├── data/                       # MPRA count tables, ATAC/RNA-seq, phyloP, MSAs, predictions
 ├── extdata/                    # Pre-computed R binary data for figure scripts
-├── imgs/                       # Phylogenetic tree images
+├── imgs/                       # Phylogenetic silhouette images (from https://www.phylopic.org/)
 ├── scripts/
 │   ├── make_figure1.R … make_figure5.R          # Main figures (paper 1)
 │   ├── make_supp_figure*.R, make_ext_data_fig1.R # Supplementary figures (paper 1)
