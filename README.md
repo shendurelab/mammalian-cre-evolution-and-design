@@ -71,3 +71,7 @@ See subdirectory READMEs for component-specific dependencies.
 ## Data
 
 Large data files (MPRA count tables, TFBS predictions, cactus alignments, ATAC/RNA-seq signals) are in `data/`. See individual figure scripts for the specific files each one consumes.
+
+## License
+
+Released under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) license. PhyloPic silhouettes under `imgs/` retain their original individual licenses (see [`imgs/README.md`](imgs/README.md)).
