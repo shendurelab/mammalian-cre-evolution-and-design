@@ -1,4 +1,7 @@
 # Large data files (>50MB) — host externally (e.g., Zenodo, GEO)
+# NOTE: oCRE_and_CRE_optimization_MPRA_count_table.txt.gz is replaced by the
+# slim pre-winsorized oCRE_and_CRE_optimization_MPRA_act.txt.gz (committed).
+# The raw count table is only needed for make_supp_figure1_and_2.R.
 data/oCRE_ProBound_ParEndo_TFBS_predictions.txt.gz
 data/CRE_optimization_ProBound_ParEndo_TFBS_predictions.txt.gz
 data/in_silico_evolution_model_driven_order.txt.gz

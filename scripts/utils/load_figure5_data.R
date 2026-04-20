@@ -59,15 +59,20 @@ add_func_mapping <- function(data){
     return(final.df)
 }
 
-print("Loading model trajectory dataset...") 
-df_counts_w_CREs2 <- read.table("../data/oCRE_and_CRE_optimization_MPRA_count_table.txt.gz",
-                                header=TRUE)
-
-
-# BC per CRE recovered?
-coverage_lib <- calculate_MPRA_coverage(df_counts_w_CREs2)
-df_wide <- generate_MPRA_wide_table(df_counts_w_CREs2, coverage_lib)
-df_mpra_act <- generate_winsorize_MPRA_table(df_wide)
+print("Loading model trajectory dataset...")
+# Prefer the pre-computed winsorized per-CRE activity table (ships in the
+# repo; ~500 KB). Fall back to recomputing from the raw BC-level count
+# table (~62 MB, gitignored) if the pre-computed file is not present.
+if (file.exists("../data/oCRE_and_CRE_optimization_MPRA_act.txt.gz")) {
+    df_mpra_act <- read.table("../data/oCRE_and_CRE_optimization_MPRA_act.txt.gz",
+                              header = TRUE, sep = "\t")
+} else {
+    df_counts_w_CREs2 <- read.table("../data/oCRE_and_CRE_optimization_MPRA_count_table.txt.gz",
+                                    header = TRUE)
+    coverage_lib <- calculate_MPRA_coverage(df_counts_w_CREs2)
+    df_wide <- generate_MPRA_wide_table(df_counts_w_CREs2, coverage_lib)
+    df_mpra_act <- generate_winsorize_MPRA_table(df_wide)
+}
 
 control_mean_act <- df_mpra_act %>% filter(class%in%c('neg_control','pos_control')) %>% group_by(CRE_id) %>% 
         summarise(mean_MPRA_act = mean(MPRA_act), sd_MPRA_act = sd(MPRA_act)) %>% dplyr::select(CRE_id, mean_MPRA_act, sd_MPRA_act)
