@@ -64,7 +64,7 @@ python scripts/oligo_design/derivatization_CRE/shuffleCREFasta_chromTiles.py
 
 - **R** (≥4.3) with tidyverse, ggplot2, cowplot, ggtree, Biostrings, GenomicRanges, castor, phytools, ape, DescTools, ggrastr
 - **Python** (≥3.7) with tensorflow, chrombpnet, pyfaidx, pyBigWig, biopython, pandas, numpy, python-Levenshtein
-- **CLI**: bowtie2, samtools, bedtools, pear, macs2, kentUtils, snakemake
+- **CLI**: bowtie2, samtools, bedtools, pear, macs2, kentUtils, snakemake, mafft
 
 See subdirectory READMEs for component-specific dependencies.
 
