@@ -137,8 +137,16 @@ names(col_TFs) <- final_TFs
 print("Loading cactus TFBS dataset...")
 df_TF_max_aff <- read.table("../data/ParEndo_markerTF_cuttoffs.txt",
                             header=TRUE)
-cactus.tfbs <- read.delim(gzfile("../data/oCRE_ProBound_ParEndo_TFBS_predictions.txt.gz"),
-                       sep = '\t')
+# Prefer the slim committed TFBS table (~32 MB, only the 6 columns + 7 TFs
+# the figure scripts use). Fall back to the raw ~264 MB file if the slim
+# one is absent (e.g., if the user re-ran the preprocessor or is working
+# off the original full file).
+.tfbs_file <- if (file.exists("../data/oCRE_ProBound_ParEndo_TFBS_predictions_slim.txt.gz")) {
+    "../data/oCRE_ProBound_ParEndo_TFBS_predictions_slim.txt.gz"
+} else {
+    "../data/oCRE_ProBound_ParEndo_TFBS_predictions.txt.gz"
+}
+cactus.tfbs <- read.delim(gzfile(.tfbs_file), sep = '\t')
 CRE_oi <- cactus.tfbs %>% pull(CRE) %>% str_split("__") %>% lapply("[[",1) %>% unlist()
 species_oi <- cactus.tfbs %>% pull(CRE) %>% str_split("__") %>% lapply("[[",2) %>% unlist() %>%
                 str_split("_20240416") %>% lapply("[[",1) %>% unlist()
