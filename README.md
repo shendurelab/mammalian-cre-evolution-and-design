@@ -26,13 +26,13 @@ mammalian-cre-evolution-and-design/
 │   │   ├── compact_optimization/        # Iterative 1bp deletion
 │   │   └── derivatization_CRE/          # TFBS shuffling / reconstitution / deposition
 │   └── chrombpnet_modeling/    # Cell-type chromBPNet model training from scATAC
-└── mpra-barcode-pipeline/      # End-to-end MPRA BC dictionary + quantification pipeline
+└── mpra-barcode-quant-pipeline/      # End-to-end MPRA BC dictionary + quantification pipeline
 ```
 
 ## What's in each directory
 
 - **`scripts/make_figure*.R`** – R scripts that regenerate the main and supplementary figure panels **for paper 1** (the evolution paper), from files in `data/` and `extdata/`. Shared helpers live in `scripts/utils/`. Figure scripts for paper 2 will be added as the manuscript is finalized.
-- **`mpra-barcode-pipeline/`** – Configured for the PYS2 oCREv2 MPRA. Takes raw FASTQs → BC-CRE dictionary → BC quantification → per-CRE activity. See [`mpra-barcode-pipeline/README.md`](mpra-barcode-pipeline/README.md).
+- **`mpra-barcode-quant-pipeline/`** – Configured for the PYS2 oCREv2 MPRA. Takes raw FASTQs → BC-CRE dictionary → BC quantification → per-CRE activity. See [`mpra-barcode-quant-pipeline/README.md`](mpra-barcode-quant-pipeline/README.md).
 - **`scripts/oligo_design/`** – Generates the synthetic CRE sequences tested in MPRA, using a trained chromBPNet model. See [`scripts/oligo_design/README.md`](scripts/oligo_design/README.md).
 - **`scripts/chrombpnet_modeling/`** – Trains cell-type-specific chromBPNet models from mEB scATAC-seq used by the oligo-design scripts. See [`scripts/chrombpnet_modeling/README.md`](scripts/chrombpnet_modeling/README.md).
 - **`scripts/cactus_liftover/`** – Pulls orthologous CRE sequences across 241 mammals from UCSC cactus alignments.
@@ -44,7 +44,7 @@ mammalian-cre-evolution-and-design/
 Rscript scripts/make_figure4.R
 
 # 2. Re-run MPRA processing from FASTQs
-cd mpra-barcode-pipeline
+cd mpra-barcode-quant-pipeline
 bash 01_build_index.sh && bash 02_build_dictionary.sh && Rscript 03_filter_dictionary.R …
 bash 04_quantify_barcodes.sh && Rscript 05_merge_and_count.R … && Rscript 06_analyze_mpra.R …
 
