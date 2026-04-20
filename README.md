@@ -6,7 +6,7 @@ Code and data to reproduce the analyses and figures from our two companion studi
 
 ## Papers
 
-1. Functional plasticity and tunability in the evolution of mammalian cis-regulatory elements
+1. Retracing and rewriting the evolutionary trajectories of mammalian developmental enhancers
 2. Multi-scale dissection, compaction and derivatization of mammalian developmental enhancers
 
 ## Repository layout
