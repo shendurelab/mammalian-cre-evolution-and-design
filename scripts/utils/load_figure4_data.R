@@ -38,7 +38,7 @@ print("Finish loading cactus tree")
 
 #### evo model driven activity
 print("Loading evo model dataset...")
-evo_model_mean_act <- read.delim("../data/PYS2_evo_model_MPRA_mean_act_20250214.txt.gz", sep = '\t')
+evo_model_mean_act <- read.delim("../data/PYS2_evo_model_MPRA_mean_act.txt.gz", sep = '\t')
 colnames(evo_model_mean_act)[1] <- 'tile_name'
 evo_model_twist_order <- read.delim('../data/twist_in_silico_evolution_model_driven_order_wpos_phyloP.txt', sep = '\t') %>% select(-oligo_seq, -oligo_seq_width, -step)
 
@@ -72,7 +72,7 @@ traj_oi_list <- c("Gata4_chr14_5729__fullTreeAnc239__Mus_musculus", "Epas1_chr17
                  "Lama1_chr17_7784__fullTreeAnc239__Mus_musculus")
 # model_mpra_plot <- plot_group_mpra_traj(evo_model_mean_act, traj_oi_list,"fullTreeAnc239", ref.events, target.events, ncol = 3)
 print("Loading evo random model dataset...")                       
-evo_random_mean_act <- read.delim("../data/PYS2_evo_random_MPRA_mean_act_20250214.txt.gz", sep = '\t')
+evo_random_mean_act <- read.delim("../data/PYS2_evo_random_MPRA_mean_act.txt.gz", sep = '\t')
 colnames(evo_random_mean_act)[1] <- 'tile_name'
 evo_random_twist_order <- read.delim('../data/twist_in_silico_evolution_random_walk_order_wpos_phyloP_map_model_ranks.txt', sep = '\t') %>% select( -oligo_seq, -oligo_seq_width, -width)
 
@@ -161,7 +161,7 @@ oCRE_mean_act <- oCRE_mean_act %>% separate(tile_id, c('full_CRE_id','species'),
 ### get mouse WT controls
 df_mouse_tiles_mpra <- oCRE_mean_act %>% filter(species == 'Mus_musculus') 
 
-dist.mat <- read.delim("../data/JB_ortholog_CREs_corrected_pairwise_pid.txt.gz",
+dist.mat <- read.delim("../data/ortholog_CREs_corrected_pairwise_pid.txt.gz",
                       sep = '\t')
                                       
 

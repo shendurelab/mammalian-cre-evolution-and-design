@@ -22,7 +22,7 @@ export PROBOUND_JAR=/path/to/ProBound-jar-with-dependencies.jar
 
 # oCRE v2 sequences -> oCRE TFBS predictions (used by Fig 1/2 loaders)
 bash scripts/probound_tfbs_mapping/run_probound.sh \
-     /path/to/all_oCRE_cactusv2_reoriented_20240417.fa \
+     /path/to/all_oCRE_cactusv2_reoriented.fa \
      data/oCRE_ProBound_ParEndo_TFBS_predictions.txt.gz 8
 
 # CRE-optimization trajectory sequences -> Fig 5 loader
@@ -48,7 +48,7 @@ Gzipped TSV with columns: `start_pos, end_pos, kmer_seq, affinity_FOR, affinity_
 
 These are not shipped in this directory (several MB each; use the original lab paths or regenerate from the cactus alignment + oCRE coordinates):
 
-- `all_oCRE_cactusv2_reoriented_20240417.fa` — reoriented oCRE sequences across 241 mammalian species
+- `all_oCRE_cactusv2_reoriented.fa` — reoriented oCRE sequences across 241 mammalian species
 - `twist_CRE_activity_trajectory_order.fa`, `twist_in_silico_evolution_{model_driven,phyloP_walk,random_walk}_order.fa` — Twist oligo order sequences for the CRE-optimization trajectories
 
 The sequence headers used become the `CRE` column in the output.

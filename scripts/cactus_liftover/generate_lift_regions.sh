@@ -21,7 +21,7 @@
 #
 # This script ships with:
 #   - stitchHalFrags_v2.R                       (post-processing helper)
-#   - active_CRE_for_tiling_20230404.bed        (default source mm10 regions
+#   - active_CRE_for_tiling.bed        (default source mm10 regions
 #                                                used in the paper)
 #
 # Usage:
@@ -43,7 +43,7 @@
 #   -s  Target species name, or quoted space-separated list of names
 #   -S  File with one target species name per line
 #   -b  Source BED file in the source genome
-#         (default: active_CRE_for_tiling_20230404.bed next to this script)
+#         (default: active_CRE_for_tiling.bed next to this script)
 #   -q  Source (query) species name in the HAL         (default: Mus_musculus)
 #   -m  minMatch: min fraction of original interval covered    (default: 0.5)
 #   -f  maxFrac:  max fraction of original interval covered    (default: 1.5)
@@ -61,7 +61,7 @@ MIN_MATCH="0.5"
 MAX_FRAC="1.5"
 HAL_LIFTOVER_BIN="halLiftover"
 STITCH_R="${SCRIPT_DIR}/stitchHalFrags_v2.R"
-SRC_BED="${SCRIPT_DIR}/active_CRE_for_tiling_20230404.bed"
+SRC_BED="${SCRIPT_DIR}/active_CRE_for_tiling.bed"
 HAL_FILE=""
 OUT_DIR=""
 SPECIES_ARG=""

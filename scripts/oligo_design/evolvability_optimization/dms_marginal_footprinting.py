@@ -105,7 +105,7 @@ from evolvability import get_seq, load_model_wrapper, minimize_next_generation, 
 name = []
 seq = []
 cre = []
-for record in SeqIO.parse('/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/syn_CREs/evolvability_optimization/DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile_20231205.fa','fasta'):
+for record in SeqIO.parse('/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/syn_CREs/evolvability_optimization/DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile.fa','fasta'):
     header= str(record.id)
     cre_id = header.split("_tile_")[1]
     name.append(header)

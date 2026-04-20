@@ -46,7 +46,7 @@ df_min <- read.table(file.path(dict_dir, "minP_final_BC_list.txt.gz"),
                       header = TRUE)
 df_EEF1A <- read.table(file.path(dict_dir, "EEF1aP_final_BC_list.txt.gz"),
                         header = TRUE)
-df_full <- read.table(file.path(dict_dir, "fullCRE_BC_asso_10percent_complexity_lib_20231126.txt.gz"),
+df_full <- read.table(file.path(dict_dir, "fullCRE_BC_asso_10percent_complexity_lib.txt.gz"),
                        header = TRUE)
 
 # Normalize columns and assign class labels

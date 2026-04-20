@@ -33,7 +33,7 @@ def create_pwm(sequence_dict, output):
             count += 1
 
 fasta_dict = dict()
-for record in SeqIO.parse(os.path.join(DATA_DIR, 'DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile_20231205.fa'),'fasta'):
+for record in SeqIO.parse(os.path.join(DATA_DIR, 'DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile.fa'),'fasta'):
     header= str(record.id)
     cre_id = header.split("_tile_")[1]
     fasta_dict[cre_id] = str(record.seq)
@@ -41,17 +41,17 @@ for record in SeqIO.parse(os.path.join(DATA_DIR, 'DMS_300bp_tiles_15bp_symmetric
 
 seq_dict = dict()
 # create_fasta(fasta_dict, 'max_endo_chromBPnet_320bp_subtiles.fa')
-endo_tfbs_hits = pd.read_csv(os.path.join(DATA_DIR, "TFBS_ProBound_Gata6_Sox17_Foxa2_Klf4_ParEndo_maxTileDMS_20240409.txt"), sep = '\t')
+endo_tfbs_hits = pd.read_csv(os.path.join(DATA_DIR, "TFBS_ProBound_Gata6_Sox17_Foxa2_Klf4_ParEndo_maxTileDMS.txt"), sep = '\t')
 endo_tfbs_hits['start_pos'] = endo_tfbs_hits['TFBS_start'].astype(int) - 1
 endo_tfbs_hits['end_pos'] = endo_tfbs_hits['TFBS_end'].astype(int)
 endo_tfbs_hits = endo_tfbs_hits[endo_tfbs_hits['CRE'].isin(fasta_dict.keys())]
 
-endo_tfbs_minus1_hits = pd.read_csv(os.path.join(DATA_DIR, "TFBS_flanks_minus1_ProBound_Gata6_Sox17_Foxa2_Klf4_ParEndo_maxTileDMS_20240409.txt"), sep = '\t')
+endo_tfbs_minus1_hits = pd.read_csv(os.path.join(DATA_DIR, "TFBS_flanks_minus1_ProBound_Gata6_Sox17_Foxa2_Klf4_ParEndo_maxTileDMS.txt"), sep = '\t')
 endo_tfbs_minus1_hits['start_pos'] = endo_tfbs_minus1_hits['TFBS_start'].astype(int) - 1
 endo_tfbs_minus1_hits['end_pos'] = endo_tfbs_minus1_hits['TFBS_end'].astype(int)
 endo_tfbs_minus1_hits = endo_tfbs_minus1_hits[endo_tfbs_minus1_hits['CRE'].isin(fasta_dict.keys())]
 
-endo_tfbs_minus2_hits = pd.read_csv(os.path.join(DATA_DIR, "TFBS_flanks_minus2_ProBound_Gata6_Sox17_Foxa2_Klf4_ParEndo_maxTileDMS_20240409.txt"), sep = '\t')
+endo_tfbs_minus2_hits = pd.read_csv(os.path.join(DATA_DIR, "TFBS_flanks_minus2_ProBound_Gata6_Sox17_Foxa2_Klf4_ParEndo_maxTileDMS.txt"), sep = '\t')
 endo_tfbs_minus2_hits['start_pos'] = endo_tfbs_minus2_hits['TFBS_start'].astype(int) - 1
 endo_tfbs_minus2_hits['end_pos'] = endo_tfbs_minus2_hits['TFBS_end'].astype(int)
 endo_tfbs_minus2_hits = endo_tfbs_minus2_hits[endo_tfbs_minus2_hits['CRE'].isin(fasta_dict.keys())]

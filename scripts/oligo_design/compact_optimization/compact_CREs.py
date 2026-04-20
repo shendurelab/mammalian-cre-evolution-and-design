@@ -46,7 +46,7 @@ REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..'))
 # reuse CRE tile FASTA that already ships with derivatization_CRE
 CRE_FASTA = os.path.join(
     SCRIPT_DIR, '..', 'derivatization_CRE', 'data',
-    'DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile_20231205.fa',
+    'DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile.fa',
 )
 FOLD_JSON = os.path.join(DATA_DIR, 'fold_0.json')
 BG_REGIONS_BED = os.path.join(DATA_DIR, 'endo_negatives_10ksubset.bed')

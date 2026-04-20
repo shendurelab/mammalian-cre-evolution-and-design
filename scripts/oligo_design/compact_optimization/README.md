@@ -9,7 +9,7 @@ Small inputs ship here:
 - `data/fold_0.json` — chromBPNet train/test split (test = chr1, chr4, chr6). 1000 test-chromosome negatives are sampled for the background pool.
 - `data/endo_negatives_10ksubset.bed` — 10 k endoderm non-peak regions; 1000 are sampled (seed 42).
 
-The CRE tile FASTA is reused from the neighboring derivatization library (no duplication): `../derivatization_CRE/data/DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile_20231205.fa`.
+The CRE tile FASTA is reused from the neighboring derivatization library (no duplication): `../derivatization_CRE/data/DMS_300bp_tiles_15bp_symmetric_extension_max_activity_270bp_subtile.fa`.
 
 Two external inputs come from env vars (or edit the defaults at the top of the script):
 

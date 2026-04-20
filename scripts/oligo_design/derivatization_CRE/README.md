@@ -8,9 +8,9 @@ Self-contained — every input is under `data/`. Run `python shuffleCREFasta_chr
 
 | File | What |
 |---|---|
-| `DMS_300bp_tiles_..._20231205.fa` | Source CRE tiles (mouse 300 bp max-activity subtiles). |
-| `TFBS_ProBound_Gata6_Sox17_Foxa2_Klf4_ParEndo_maxTileDMS_20240409.txt` | ProBound TFBS predictions in ParEndo on the max-activity tiles. |
-| `TFBS_flanks_minus{1,2}_ProBound_..._20240409.txt` | Same table with TFBS hits trimmed by 1 / 2 bp each flank. |
+| `DMS_300bp_tiles_..._subtile.fa` | Source CRE tiles (mouse 300 bp max-activity subtiles). |
+| `TFBS_ProBound_Gata6_Sox17_Foxa2_Klf4_ParEndo_maxTileDMS.txt` | ProBound TFBS predictions in ParEndo on the max-activity tiles. |
+| `TFBS_flanks_minus{1,2}_ProBound_..._maxTileDMS.txt` | Same table with TFBS hits trimmed by 1 / 2 bp each flank. |
 | `max_endo_chromBPnet_320bp_subtile_shuffled_v2.tsv` | Background sequences from the pCRE v1 library. |
 | `endo_bg_2k.fa` | 2 000-sequence pool; 100 new backgrounds are sampled on top of v1. |
 

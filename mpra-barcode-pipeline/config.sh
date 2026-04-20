@@ -17,11 +17,11 @@ GENOME_FA="/net/gs/vol1/home/tli824/bin/references/human/UCSC/hg38/hg38.fa"
 # --- CRE library FASTAs (one entry per designed element) ---
 # Multiple reference sets used for index building (Step 1).
 # The primary index for oCRE dictionary alignment:
-CRE_FASTA="/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/data/twist_v3_fastqs_20240615/ref_fasta/all_oCRE_cactusv2_reoriented_20240417_dedupped.fa"
+CRE_FASTA="/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/data/twist_v3_fastqs_20240615/ref_fasta/all_oCRE_cactusv2_reoriented_dedupped.fa"
 
 # All reference FASTAs and their index names (used by 01_build_index.sh array mode)
 CRE_FASTA_ARRAY=(
-    "/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/data/twist_v3_fastqs_20240615/ref_fasta/all_oCRE_cactusv2_reoriented_20240417_dedupped.fa"
+    "/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/data/twist_v3_fastqs_20240615/ref_fasta/all_oCRE_cactusv2_reoriented_dedupped.fa"
     "/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/data/twist_v3_fastqs_20240615/ref_fasta/compact.fa"
     "/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/data/twist_v3_fastqs_20240615/ref_fasta/CRE_activity_trajectory.fa"
     "/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/data/twist_v3_fastqs_20240615/ref_fasta/evo_model.fa"
@@ -75,13 +75,13 @@ DICT_FILES=(
     "${PIPELINE_DIR}/data/dictionaries/Engreitz_controls_final_BC_list.txt"
     "${PIPELINE_DIR}/data/dictionaries/minP_final_BC_list.txt.gz"
     "${PIPELINE_DIR}/data/dictionaries/EEF1aP_final_BC_list.txt.gz"
-    "${PIPELINE_DIR}/data/dictionaries/fullCRE_BC_asso_10percent_complexity_lib_20231126.txt.gz"
+    "${PIPELINE_DIR}/data/dictionaries/fullCRE_BC_asso_10percent_complexity_lib.txt.gz"
 )
 # Class labels corresponding to each dictionary file above
 DICT_CLASSES=("CRE_traj" "oCRE" "Engreitz_control" "neg_control" "pos_control" "full_CRE")
 
 # --- Duplicate CRE reference (for Step 5b: add_dups_in_oCREs) ---
-DUP_REF="${PIPELINE_DIR}/data/dictionaries/all_oCRE_cactusv2_reoriented_20240417_marked_dups.txt"
+DUP_REF="${PIPELINE_DIR}/data/dictionaries/all_oCRE_cactusv2_reoriented_marked_dups.txt"
 
 # --- Control dictionaries (optional; leave empty arrays if none) ---
 CONTROL_DICT_FILES=()

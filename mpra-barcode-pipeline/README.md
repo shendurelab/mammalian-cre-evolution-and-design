@@ -40,7 +40,7 @@ Rscript 03_filter_dictionary.R output/dict_pileups/*.txt.gz 10 output/BC_diction
 qsub sge_04_quantify_barcodes.sh
 Rscript 05_merge_and_count.R output/bc_quant output/PYS2
 python 05b_add_dups_in_oCREs.py output/PYS2_count_table_wo_zeroes.txt.gz \
-       data/dictionaries/all_oCRE_cactusv2_reoriented_20240417_marked_dups.txt \
+       data/dictionaries/all_oCRE_cactusv2_reoriented_marked_dups.txt \
        output/PYS2
 
 # 3) analysis

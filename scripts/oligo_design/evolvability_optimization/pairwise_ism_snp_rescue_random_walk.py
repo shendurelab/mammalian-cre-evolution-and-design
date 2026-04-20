@@ -266,7 +266,7 @@ footprints_at_motifs[motif]=[motif_footprint,motif_counts]
 num_threads = 8
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=num_threads)
 
-tiles_df = pd.read_csv("/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/syn_CREs/evolvability_optimization/JB_ortholog_CREs_corrected.txt", sep = '\t')
+tiles_df = pd.read_csv("/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/syn_CREs/evolvability_optimization/ortholog_CREs_corrected.txt", sep = '\t')
 
 pairs = [['Gata4_chr14_5729','Mus_musculus','Rattus_norvegicus'],
         ['Gata4_chr14_5729','Mus_musculus','Homo_sapiens'],

@@ -8,7 +8,7 @@ Standalone bash port of the `generate_lift_regions` Snakemake rule from the pape
 |---|---|
 | `generate_lift_regions.sh` | Driver: `halLiftover` + stitching for one or more target species. |
 | `stitchHalFrags_v2.R` | Merges lifted fragments per source region; filters by `minMatch` / `maxFrac`. |
-| `active_CRE_for_tiling_20230404.bed` | Default source mm10 regions (override with `-b`). |
+| `active_CRE_for_tiling.bed` | Default source mm10 regions (override with `-b`). |
 
 ## Requirements
 
@@ -40,7 +40,7 @@ Standalone bash port of the `generate_lift_regions` Snakemake rule from the pape
 | `-H` | — | Cactus `.hal` *(required)* |
 | `-o` | — | Output dir *(required)* |
 | `-s` / `-S` | — | Target species (quoted list) or file with one per line *(need one)* |
-| `-b` | `active_CRE_for_tiling_20230404.bed` | Source BED |
+| `-b` | `active_CRE_for_tiling.bed` | Source BED |
 | `-q` | `Mus_musculus` | Query species in the HAL |
 | `-m` | `0.5` | `minMatch` (min covered fraction of source) |
 | `-f` | `1.5` | `maxFrac` (max span vs source width) |

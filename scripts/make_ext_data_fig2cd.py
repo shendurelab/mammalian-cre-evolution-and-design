@@ -12,7 +12,7 @@ Environment:
     conda activate /net/shendure/vol10/projects/tli/ledidi     # (tangermeme + bpnetlite + ledidi)
 
 Inputs (all resolved relative to REPO_ROOT):
-    data/ext_data_fig2cd/all_oCRE_cactusv2_reoriented_20240417_pwm.txt
+    data/ext_data_fig2cd/all_oCRE_cactusv2_reoriented_pwm.txt
     data/ext_data_fig2cd/tfbs_tables/Epas1_oCRE_func_TFBS_mapping.txt
     data/ext_data_fig2cd/tfbs_tables/Rattus_norvegicus_Gata4_CRE_func_TFBS_mapping.txt
     data/chrombpnet_models/endo/endo_bias.h5
@@ -159,7 +159,7 @@ mouse_DMS_tfbs = mouse_DMS_tfbs[mouse_DMS_tfbs["TF_name"].isin(final_TFs)]
 # --- Keep only functional TFs ---
 mouse_func_tfbs = mouse_DMS_tfbs[mouse_DMS_tfbs["functional_TF"]]
     
-oCRE_seq_dataframe = pd.read_csv(FIG_DATA / "all_oCRE_cactusv2_reoriented_20240417_pwm.txt",
+oCRE_seq_dataframe = pd.read_csv(FIG_DATA / "all_oCRE_cactusv2_reoriented_pwm.txt",
                                  sep='\t', header=None)
 oCRE_seq_dataframe[[ "CRE", "species" ]] = oCRE_seq_dataframe[0].str.split("__", expand=True)
 oCRE_seq_dataframe.columns = ['id','seq','CRE','species']

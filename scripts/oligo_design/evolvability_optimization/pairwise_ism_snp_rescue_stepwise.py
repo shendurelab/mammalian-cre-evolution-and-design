@@ -268,7 +268,7 @@ ancestral_annotations = pd.read_csv('/net/shendure/vol10/projects/tli/nobackup/E
 ancestral_annotations = ancestral_annotations.iloc[::-1]
 
 
-tiles_df = pd.read_csv("/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/syn_CREs/evolvability_optimization/JB_ortholog_CREs_corrected.txt", sep = '\t')
+tiles_df = pd.read_csv("/net/shendure/vol10/projects/tli/nobackup/EB_dev_project/syn_CREs/evolvability_optimization/ortholog_CREs_corrected.txt", sep = '\t')
 
 cres = ['Gata4_chr14_5729','Epas1_chr17_10063','Sparc_chr11_7211']
 pairs = []
