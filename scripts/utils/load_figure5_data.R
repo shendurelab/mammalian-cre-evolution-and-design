@@ -154,8 +154,14 @@ names(col_TFs) <- final_TFs
 
 df_TF_max_aff <- read.table("../data/ParEndo_markerTF_cuttoffs.txt",
                             header=TRUE)
-traj.tfbs <- read.delim(gzfile("../data/CRE_optimization_ProBound_ParEndo_TFBS_predictions.txt.gz"),
-                       sep = '\t')
+# Prefer the slim committed TFBS table (~6 MB, only the 6 columns + 7 TFs
+# used downstream). Fall back to the raw ~88 MB file if the slim one is absent.
+.tfbs_file <- if (file.exists("../data/CRE_optimization_ProBound_ParEndo_TFBS_predictions_slim.txt.gz")) {
+    "../data/CRE_optimization_ProBound_ParEndo_TFBS_predictions_slim.txt.gz"
+} else {
+    "../data/CRE_optimization_ProBound_ParEndo_TFBS_predictions.txt.gz"
+}
+traj.tfbs <- read.delim(gzfile(.tfbs_file), sep = '\t')
 # joining Gata4/6 calls to avoid redundancy
 gata.tfbs <- traj.tfbs %>% filter(TF_name %in% c("Gata4", "Gata6")) 
 gata.tfbs <- gata.tfbs %>% mutate(TF_name = "Gata4/6") %>%
@@ -166,7 +172,7 @@ traj.tfbs <- bind_rows(traj.tfbs %>% filter(!TF_name %in% c("Gata4", "Gata6")),
                          gata.tfbs) 
 traj.tfbs <- traj.tfbs %>% filter(TF_name%in%final_TFs)
 traj.tfbs$start_pos <- traj.tfbs$start_pos + 1 ### fix 0-index position from probound
-colnames(traj.tfbs)[8] <- 'tile_name'
+names(traj.tfbs)[names(traj.tfbs) == "CRE"] <- "tile_name"
 traj.tfbs <- left_join(traj.tfbs, traj_info_df, 
                                    by =c('tile_name')) %>% dplyr::select(-seq)     
 ### load functional mouse TFBS data
