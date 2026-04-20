@@ -193,34 +193,7 @@ names(col_TFs) <- final_TFs
 
 df_TF_max_aff <- read.table("../data/ParEndo_markerTF_cuttoffs.txt",
                             header=TRUE)
-print("Loading evo model TFBS dataset...")
-# Prefer the slim committed TFBS table (~18 MB, only the 6 columns + 7 TFs
-# used downstream). Fall back to the raw ~207 MB file if the slim is absent.
-.evo_tfbs_file <- if (file.exists("../data/in_silico_evolution_model_driven_order_slim.txt.gz")) {
-    "../data/in_silico_evolution_model_driven_order_slim.txt.gz"
-} else {
-    "../data/in_silico_evolution_model_driven_order.txt.gz"
-}
-final_evo.tfbs <- read.delim(.evo_tfbs_file, sep = '\t')
-# joining Gata4/6 calls to avoid redundancy
-gata.tfbs <- final_evo.tfbs %>% filter(TF_name %in% c("Gata4", "Gata6")) 
-gata.tfbs <- gata.tfbs %>% mutate(TF_name = "Gata4/6") %>%
-  group_by(start_pos, end_pos, CRE) %>%
-  dplyr::slice_max(order_by = norm_affinity, with_ties = FALSE) %>%
-  ungroup()
-final_evo.tfbs <- bind_rows(final_evo.tfbs %>% filter(!TF_name %in% c("Gata4", "Gata6")),
-                         gata.tfbs) 
-final_evo.tfbs <- final_evo.tfbs %>% filter(TF_name%in%final_TFs)
-final_evo.tfbs$start_pos <- final_evo.tfbs$start_pos + 1 ### fix 0-index position from probound
-names(final_evo.tfbs)[names(final_evo.tfbs) == "CRE"] <- "tile_name"
-final_evo.tfbs <- left_join(final_evo.tfbs, evo_model_twist_order, 
-                                   by =c('tile_name')) %>% select(-seq) 
-final_evo.tfbs <-  final_evo.tfbs %>% 
-            mutate(
-    CRE = sub("_", ":", CRE)  # Replace underscores with colons
-  )
-print("Finish loading evo model TFBS dataset")
-                                                                      
+
 ### load functional mouse TFBS data
 mouse_DMS_tfbs <- read.delim("../data/mouse_TFBS_impact_and_affinity_CRM.txt", sep = '\t')
 gata.tfbs <- mouse_DMS_tfbs %>% filter(TF_name %in% c("Gata4", "Gata6")) 
