@@ -7,7 +7,7 @@ Code and data to reproduce the analyses and figures from our two companion studi
 ## Papers
 
 1. Retracing and rewriting the evolutionary trajectories of mammalian developmental enhancers ([bioRxiv](https://www.biorxiv.org/content/10.64898/2026.04.20.719714v1))
-2. Multi-scale dissection, compaction and derivatization of mammalian developmental enhancers ([bioRxiv](https://www.biorxiv.org/content/10.64898/2026.04.20.719625v1))
+2. Multi-scale dissection, compaction and derivatization of mammalian developmental enhancers ([bioRxiv](https://www.biorxiv.org/content/10.64898/2026.04.20.719625v1); additional code on [Zenodo](https://doi.org/10.5281/zenodo.19658454))
 
 ## Repository layout
 
