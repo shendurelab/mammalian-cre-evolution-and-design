@@ -78,7 +78,7 @@ signal.long <- signal.df %>%
   pivot_longer(cols = -c(peak_id, chr, start, end, PYS2), names_to = "cell_type", values_to = "signal") %>%
   drop_na()  # Remove missing values
 
-signal.filter <- signal.long %>% filter(PYS2 > 0) %>% filter(signal > 0)
+signal.filter <- signal.long #%>% filter(PYS2 > 0) %>% filter(signal > 0)
 dim(signal.filter)
 
 # Compute correlations
@@ -123,7 +123,7 @@ da_signal.long <- da_signal.df %>%
   pivot_longer(cols = -c(peak_id, chr, start, end, PYS2), names_to = "cell_type", values_to = "signal") %>%
   drop_na()  # Remove missing values
 
-da_signal.filter <- da_signal.long %>% filter(PYS2 > 0 ) %>% filter(signal > 0)
+da_signal.filter <- da_signal.long #%>% filter(PYS2 > 0 ) %>% filter(signal > 0)
 
 # Compute correlations
 da_cell.corr <- da_signal.long %>%
@@ -169,7 +169,7 @@ in_vivo_signal.long <- in_vivo_signal.df %>%
   pivot_longer(cols = -c(peak_id, chr, start, end, PYS2), names_to = "cell_type", values_to = "signal") %>%
   drop_na()  # Remove missing values
 
-in_vivo_signal.filter <- in_vivo_signal.long %>% filter(PYS2 > 0) %>% filter(signal > 0)
+in_vivo_signal.filter <- in_vivo_signal.long #%>% filter(PYS2 > 0) %>% filter(signal > 0)
 dim(in_vivo_signal.filter)
 
 # Compute correlations
