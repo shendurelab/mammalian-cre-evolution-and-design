@@ -727,6 +727,11 @@ df_all_CREs <- df_all_CREs %>% group_by(CRE_id, class) %>% summarise(nBC = n_dis
 df_all_CREs$class <- factor(df_all_CREs$class, levels = c('orthologous CREs', 'evolutionary trajectories',
                                                           'model-optimized trajectories','controls'))
 
+nBC_summary_by_class <- df_all_CREs %>%
+  group_by(class) %>%
+  summarise(mean_nBC = mean(nBC), sd_nBC = sd(nBC), n_CREs = n(), .groups = 'drop') %>%
+  mutate(facet_label = paste0(class, "\nmean = ", round(mean_nBC, 1), ", SD = ", round(sd_nBC, 1)))
+
 cre_bc.dist <- ggplot(df_all_CREs)+stat_bin(aes(x=nBC),geom="step",bins=50)+
   scale_y_log10(
    breaks = c(10^0, 10^1, 10^2, 10^3),
@@ -737,7 +742,7 @@ cre_bc.dist <- ggplot(df_all_CREs)+stat_bin(aes(x=nBC),geom="step",bins=50)+
    labels = scales::trans_format("log10", scales::math_format(10^.x))
  ) +
   annotation_logticks() +
-  facet_wrap(~ class, ncol = 4) +
+  facet_wrap(~ class, ncol = 4, labeller = as_labeller(setNames(nBC_summary_by_class$facet_label, nBC_summary_by_class$class))) +
     labs(x = "number of barcodes",
          y = "number of CREs") +
     theme_classic() +
