@@ -187,6 +187,59 @@ in_vivo.plot <- ggplot(cell.corr, aes(x = cell_type, y = correlation)) +
   theme(legend.position = "none",
         panel.spacing = unit(1, "lines"))
 
+######## plot motif enrichment (fold enrichment) correlations vs PYS-2
+motif_base_path <- "../data/motif_enrichment/"
+file_prefixes <- c("PYS-2", "endo", "pluri", "ecto", "meso")
+
+motif.df <- map2_dfr(file_prefixes, cell_types, ~{
+  read.delim(file.path(motif_base_path, paste0(.x, "_motif_enrichment.txt")), sep = "\t") %>%
+    transmute(motif, motif_name, log2FE = log2(fold.enrichment)) %>%
+    filter(is.finite(log2FE)) %>%
+    mutate(cell = .y)
+})
+
+# Reshape data to long format for ggplot facets
+motif.long <- motif.df %>%
+  pivot_wider(names_from = cell, values_from = log2FE) %>%
+  pivot_longer(cols = -c(motif, motif_name, PYS2), names_to = "cell_type", values_to = "log2FE") %>%
+  drop_na()
+
+# Compute correlations
+motif.corr <- motif.long %>%
+  group_by(cell_type) %>%
+  summarise(correlation = cor(log2FE, PYS2, method = "spearman"), r2 = correlation^2)
+
+motif.long$cell_type <- factor(motif.long$cell_type, levels = c("Parietal Endoderm", "Pluripotent", "Ectoderm", "Mesoderm"))
+motif.corr$cell_type <- factor(motif.corr$cell_type, levels = c("Parietal Endoderm", "Pluripotent", "Ectoderm", "Mesoderm"))
+motif.long <- motif.long %>%
+  left_join(motif.corr, by = "cell_type") %>%
+  mutate(cell_label = paste0(cell_type, "\nrho = ", round(correlation, 3)))  # use for labeling only
+
+# highlight the same key endoderm-specifying TF motifs used elsewhere in this project
+final_TFs <- c("Jun_Atf3", "Foxa2", "Gata4/6", "Sox17", "Klf4", "Hnf1b")
+col_TFs <- c("firebrick2", "forestgreen", "darkorange2", "dodgerblue1", "mediumorchid3", "goldenrod1")
+names(col_TFs) <- final_TFs
+check.TFs <- data.frame(tf_name = c("Sox17", "Gata4", "Gata6", "Foxa2", "Klf4",
+              "Hnf1b", "Jun", "Jund", "Atf3"), group = c("Sox17", "Gata4/6", "Gata4/6", "Foxa2", "Klf4", "Hnf1b",
+                                                     "Jun_Atf3", "Jun_Atf3", "Jun_Atf3"))
+
+tf.motifs <- motif.long %>% filter(motif_name %in% unique(check.TFs$tf_name))
+mm <- match(tf.motifs$motif_name, check.TFs$tf_name)
+tf.motifs$tf_group <- check.TFs$group[mm]
+
+motif.plot <- ggplot() +
+  stat_bin2d(data = motif.long, aes(x = log2FE, y = PYS2, fill = after_stat(count)), bins = 30) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "blue") +
+  geom_point(data = tf.motifs, aes(x = log2FE, y = PYS2, color = tf_group), size = 4, shape = 18) +
+  scale_color_manual(values = col_TFs, name = "endoderm TF group") +
+  scale_fill_viridis_c(name = "motif count") +
+  theme_classic() +
+  facet_wrap(~cell_type, ncol = 4, labeller = as_labeller(setNames(motif.long$cell_label, motif.long$cell_type))) +
+  labs(x = expression(log[2]*"(motif fold enrichment) in cell types (mEB)"),
+       y = expression(atop(log[2]*"(motif fold enrichment)", "in PYS-2"))) +
+  theme(legend.position = 'bottom',
+        panel.spacing = unit(1, "lines"))
+
 ### RNAseq correlations
 gene.name <- read.csv("../data/references/mm10_biomart_GeneIDexport.csv")
 
@@ -653,6 +706,43 @@ layout <- 'ABCD#E
 p <- GATA4 + EPAS1 + LAMA1 + SPARC + SOX2_2007 + BEND + LAMB + LAMC1 + FOXA + SOX2_2009 + plot_layout(design = layout)
 ggsave('supp_fig1_DAsites.pdf', plot = p, width = 12, height = 5)
 
+##### make supplementary fig 2
+#### CRE-BC distributions
+### tested experiment libraries
+ortho.BCs <- read.delim("../mpra-barcode-quant-pipeline/data/dictionaries/oCRE_v2_final_BC_list.txt.gz",sep = '\t') %>% transform(class = 'orthologous CREs')
+evo_random.BCs <- read.delim("../mpra-barcode-quant-pipeline/data/dictionaries/evo_random_final_BC_list.txt.gz",sep = '\t') %>% transform(class = 'evolutionary trajectories')
+evo_model.BCs <- read.delim("../mpra-barcode-quant-pipeline/data/dictionaries/evo_model_final_BC_list.txt.gz",sep = '\t') %>% transform(class = 'evolutionary trajectories')
+syn_traj.BCs <- read.delim("../mpra-barcode-quant-pipeline/data/dictionaries/CRE_traj_final_BC_list.txt.gz",sep = '\t') %>% transform(class = 'model-optimized trajectories')
+
+### controls
+EEF1A.BCs <- read.delim("../mpra-barcode-quant-pipeline/data/dictionaries/EEF1aP_final_BC_list.txt.gz",sep = '\t') %>% transform(BC1 = BC, CRE_id = 'EEF1Ap', class = 'controls') %>% dplyr::select(-BC, -reads)
+minP.BCs <- read.delim("../mpra-barcode-quant-pipeline/data/dictionaries/minP_final_BC_list.txt.gz",sep = '\t') %>% transform(BC1 = BC, CRE_id = 'minP', class = 'controls') %>% dplyr::select(-BC, -reads)
+engretiz.BCs <- read.delim("../mpra-barcode-quant-pipeline/data/dictionaries/Engreitz_controls_final_BC_list.txt",sep = '\t') %>% transform(class = 'controls')
+fullCRE.BCs <- read.delim("../mpra-barcode-quant-pipeline/data/dictionaries/fullCRE_BC_asso_10percent_complexity_lib.txt.gz",sep = '\t') %>% transform(BC1=BC, class = 'controls') %>% dplyr::select(BC1, CRE_id, class)
+
+df_all_CREs <- rbind(ortho.BCs,evo_random.BCs,evo_model.BCs,syn_traj.BCs,
+                     EEF1A.BCs, minP.BCs, engretiz.BCs, fullCRE.BCs)
+df_all_CREs <- df_all_CREs %>% filter(BC1 != "GGGGGGGGGGGGGGG") ### not detectable in illumina machine
+df_all_CREs <- df_all_CREs %>% group_by(CRE_id, class) %>% summarise(nBC = n_distinct(BC1))
+df_all_CREs$class <- factor(df_all_CREs$class, levels = c('orthologous CREs', 'evolutionary trajectories',
+                                                          'model-optimized trajectories','controls'))
+
+cre_bc.dist <- ggplot(df_all_CREs)+stat_bin(aes(x=nBC),geom="step",bins=50)+
+  scale_y_log10(
+   breaks = c(10^0, 10^1, 10^2, 10^3),
+   labels = scales::trans_format("log10", scales::math_format(10^.x))
+ ) +
+ scale_x_log10(
+   breaks = c(10^0, 10^2, 10^4),
+   labels = scales::trans_format("log10", scales::math_format(10^.x))
+ ) +
+  annotation_logticks() +
+  facet_wrap(~ class, ncol = 4) +
+    labs(x = "number of barcodes",
+         y = "number of CREs") +
+    theme_classic() +
+    theme(panel.spacing = unit(1, "lines"))
+
 ########## plot MPRA quality controls
 df_counts_w_CREs2 <- read.table("../data/oCRE_and_CRE_optimization_MPRA_count_table.txt.gz",
                                 header=TRUE)
@@ -715,7 +805,7 @@ generate_DNA_BC_R2_plots_facet <- function(data) {
               inherit.aes = FALSE,
               hjust = 1.1, vjust = -0.6) +
     theme_classic() +
-    theme(panel.spacing = unit(1, "lines"))
+    theme(panel.spacing = unit(1, "lines"), legend.position = 'bottom')
 
   # Optional: print mean R²
   print(paste0("Mean rho = ", round(mean(rep.corrs$R), 3)))
@@ -773,12 +863,35 @@ full_CRE_act <- bind_rows(full_CRE_act, control_act)
 full_CRE_mean_act <- full_CRE_act %>% group_by(CRE_id) %>% 
         summarise(q95 = quantile(MPRA_act, probs = 0.95), mean_MPRA_act = mean(MPRA_act), sd_MPRA_act = sd(MPRA_act))
 full_CRE_act$CRE_id <- factor(full_CRE_act$CRE_id, levels = CRE.list)
+
+### statistical testing: is each tested full_CRE / EEF1A1p significantly different from minP activity?
+### paired by biol_rep (t-test on log2-transformed MPRA activity, since all CREs share the same 3 replicates)
+minP_df <- full_CRE_act %>% filter(CRE_id == 'minP') %>% arrange(biol_rep) %>% select(biol_rep, minP_act = MPRA_act)
+
+full_CRE_stats <- full_CRE_act %>%
+  filter(CRE_id != 'minP') %>%
+  arrange(CRE_id, biol_rep) %>%
+  left_join(minP_df, by = 'biol_rep') %>%
+  group_by(CRE_id) %>%
+  summarise(mean_MPRA_act = mean(MPRA_act),
+            mean_minP_act = mean(minP_act),
+            log2FC_vs_minP = log2(mean_MPRA_act / mean_minP_act),
+            p_value = t.test(log2(MPRA_act), log2(minP_act), paired = TRUE)$p.value,
+            .groups = 'drop') %>%
+  mutate(padj = p.adjust(p_value, method = 'bonferroni'))
+
+full_CRE_stats
+
 pos_mean_act <- control_mean_act %>% filter(CRE_id == 'EEF1A1p') %>% mutate(xmin = mean_MPRA_act - sd_MPRA_act, xmax = mean_MPRA_act + sd_MPRA_act)
 neg_mean_act <- control_mean_act %>% filter(CRE_id == 'minP') %>% mutate(xmin = mean_MPRA_act - sd_MPRA_act, xmax = mean_MPRA_act + sd_MPRA_act)
 library(ggbeeswarm)
 x_breaks = c(10^-1, 10^0, 10^1, 10^2)
 
-fullCRE.plot <- ggplot() + 
+sig_CREs <- full_CRE_stats %>%
+  filter(padj < 0.05, log2FC_vs_minP > 1) %>%
+  left_join(full_CRE_act %>% group_by(CRE_id) %>% summarise(max_act = max(MPRA_act), .groups = 'drop'), by = 'CRE_id')
+
+fullCRE.plot <- ggplot() +
         geom_rect(data = neg_mean_act, aes(xmin = xmin, xmax = xmax), ymin = -Inf, ymax = Inf,
            alpha = .4,fill = "#0057e7")  +
         geom_vline(xintercept = control_mean_act %>% filter(CRE_id == 'minP') %>% pull(mean_MPRA_act) ,color = "#0057e7", linetype = 'dashed') + 
@@ -804,19 +917,24 @@ fullCRE.plot <- ggplot() +
            size = 4, 
            color = "#d62d20") +
         geom_vline(xintercept = 0.3 ,color = "grey", linetype = 'dashed') + 
-        geom_quasirandom(data = full_CRE_act, aes(y = CRE_id, x = MPRA_act, fill = cell_type), 
+        geom_quasirandom(data = full_CRE_act, aes(y = CRE_id, x = MPRA_act, fill = cell_type),
         dodge.width=1, size = 2, pch = 21, color = 'black', alpha = 0.8) +
+        geom_text(data = sig_CREs, aes(x = 140, y = CRE_id, label = '*'), size = 6, vjust = 0.75) +
         scale_fill_manual(values = c("#d62d20", "#FC8D62","#0057e7","#E994C8"), name = "") +
             scale_x_log10(
-               breaks = x_breaks, limits = c(0.05, 100),
+               breaks = x_breaks, limits = c(0.05, 140),
                labels = scales::trans_format("log10", scales::math_format(10^.x))
-             )+ annotation_logticks(sides = 'b') + theme_classic() + 
-            labs(x = 'MPRA activity', y = '')
+             )+ annotation_logticks(sides = 'b') + theme_classic() +
+            labs(x = 'MPRA activity', y = '') + theme(legend.position = 'bottom')
 
 layout <- '
         AAAAAAAAAAA
-        BBBBBBCCCCC
+        BBBBBBBBBB#
+        BBBBBBBBBB#
+        CCCCCCDDDDD
+        CCCCCCDDDDD
         '
-p <- DNA_bc_corr.plot + control.plot + fullCRE.plot + plot_layout(design = layout)
-ggsave('supp_fig2_QC.pdf', plot  = p, width = 210, height = 150, useDingbats = F, units = 'mm')
+p <- cre_bc.dist + DNA_bc_corr.plot + control.plot + fullCRE.plot + plot_layout(design = layout) + plot_annotation(tag_levels = 'a') &
+  theme(plot.tag = element_text(size = 12, face='bold'))
+ggsave('supp_fig2_QC.pdf', plot  = p, width = 210, height = 200, useDingbats = F, units = 'mm')
 
