@@ -361,7 +361,8 @@ layout <- "AABB#CCC
            AABB#CCC
            DDDDDDDD"
 
-p <- acc.plot + da_acc.plot + in_vivo.plot + cpm.plot + plot_layout(design = layout)
+p <- acc.plot + da_acc.plot + in_vivo.plot + motif.plot + plot_layout(design = layout) +
+    plot_annotation(tag_levels = 'a') & theme(plot.tag = element_text(size = 12, face='bold'))
 ggsave('supp_fig1_acc.pdf', plot  = p, width = 210, height = 210, useDingbats = F, units = 'mm')
 
 ###### plot tracks
