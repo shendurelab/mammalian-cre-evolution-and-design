@@ -444,7 +444,7 @@ epas1_func_tfbs.phyloP <- epas1_func_tfbs.phyloP %>%
   )) %>%
   ungroup() %>% arrange(TFBS_start)
 epas1_func_tfbs.phyloP$rank_TF <- factor(epas1_func_tfbs.phyloP$rank_TF,
-                                        levels = rev(sort(unique(epas1_func_tfbs.phyloP$rank_TF))))
+                                        levels = sort(unique(epas1_func_tfbs.phyloP$rank_TF)))
 
 epas1_func_tfbs.phyloP_avg <- epas1_func_tfbs.phyloP %>% group_by(rank_TF) %>% 
                         summarise(avg_phyloP = mean(phyloP))

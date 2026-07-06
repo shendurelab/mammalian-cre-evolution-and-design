@@ -75,18 +75,18 @@ epas1_seq_bar <- plot_seqID_trajectory(oCRE_mean_act, df_mouse_tiles_mpra, contr
 #### phyloP cum dist
 library(ggbeeswarm)
 xmax <- max(epas1_func_tfbs.phyloP$phyloP, na.rm = TRUE)
-phyloP.plot <- ggplot() + geom_quasirandom_rast(data = epas1_func_tfbs.phyloP, 
-                                                aes(x = phyloP, y = rank_TF, color = TF_name), 
-            dodge.width=1, size = 1) +  # Adjust the width for separation 
-            geom_vline(xintercept = 0 ,color = "black", linetype = 'dashed') + 
+phyloP.plot <- ggplot() + geom_quasirandom_rast(data = epas1_func_tfbs.phyloP,
+                                                aes(y = phyloP, x = rank_TF, color = TF_name),
+            dodge.width=1, size = 1) +  # Adjust the width for separation
+            geom_hline(yintercept = 0 ,color = "black", linetype = 'dashed') +
             geom_text(
                 data = epas1_func_tfbs.phyloP_avg,
-                aes(x = xmax + 0.5, y = rank_TF, label = round(avg_phyloP, 3)),
+                aes(y = xmax + 0.5, x = rank_TF, label = round(avg_phyloP, 3)),
                 inherit.aes = FALSE, hjust = 0, size = 3
-              ) + 
-                scale_color_manual(values = col_TFs, guide = 'none') + 
+              ) +
+                scale_color_manual(values = col_TFs, guide = 'none') +
             theme_classic() + coord_cartesian(clip = 'off') +
-                            labs(x = 'phyloP', y = 'rank TFBS') + 
+                            labs(y = 'phyloP', x = 'rank TFBS') +
                 theme(legend.position = 'none')
 
 
@@ -324,23 +324,25 @@ ap1_aff.plot <- ggplot(anc_aff.mat %>% filter(msa_start >= 173) %>% filter(msa_e
       legend.position = 'none'
   )
 
-layout <- 'AAAAAABCCCC
-           AAAAAABCCCC
-           AAAAAABCCCC
-           AAAAAABCCCC
-           AAAAAABCCCC
-           DDDDDD#####
-           EEEEEE#FFGG
-           EEEEEE#FFGG
-           EEEEEE#FFGG
-           EEEEEE#FFGG
-           HHHHHHHIIII
-           HHHHHHHIIII
-           HHHHHHHIIII
-           HHHHHHHIIII'
-p1 <-  epas1_gg_tfbs + epas1_seq_bar + phyloP.plot  + mouse_epas1_gg_tfbs + epas1_full_msa_plot + 
-    epas1_snp_plot + epas1_fc_plot + 
-    triplet_plot + triplet_aff.plot + plot_layout(design = layout) + plot_annotation(tag_levels = 'a') & 
+layout <- 'AAAAAAABB##
+           AAAAAAABB##
+           AAAAAAABB##
+           AAAAAAABB##
+           AAAAAAABB##
+           CCCCCC#####
+           DDDDDD#EEFF
+           DDDDDD#EEFF
+           DDDDDD#EEFF
+           DDDDDD#EEFF
+           GGGGGGGHHHH
+           GGGGGGGHHHH
+           GGGGGGGHHHH
+           GGGGGGGHHHH
+           IIIIIIIIIII
+           IIIIIIIIIII'
+p1 <-  epas1_gg_tfbs + epas1_seq_bar  + mouse_epas1_gg_tfbs + epas1_full_msa_plot +
+    epas1_snp_plot + epas1_fc_plot +
+    triplet_plot + triplet_aff.plot + phyloP.plot + plot_layout(design = layout) + plot_annotation(tag_levels = 'a') &
   theme(plot.tag = element_text(size = 12, face='bold'))
-ggsave('sup_fig6.pdf', plot = p1, width = 210, height = 260, useDingbats = F, units = 'mm', device = 'pdf') 
+ggsave('sup_fig6.pdf', plot = p1, width = 210, height = 290, useDingbats = F, units = 'mm', device = 'pdf')
 
