@@ -8,6 +8,7 @@ Regenerates the full (unslimmed) ProBound TFBS prediction tables used in the pap
 |---|---|
 | `ProBound_TFBS_mapping.py` | Per-k-mer TFBS scoring. For each FASTA record × each TF model, enumerates all k-mers at the TF's model size, scores them (forward + reverse) via ProBound, normalizes to each TF's `max_aff`, picks the stronger orientation, and writes a gzipped TSV. |
 | `run_probound.sh` | Thin driver; passes the shipped TF model table to the Python script. |
+| `get_affinity_random_sequences_Probound.R` | Regenerates the `q99`/`q99p9`/`q99p99` background-affinity quantile columns in `data/ParEndo_markerTF_cuttoffs.txt` by scoring random DNA sequences per TF model size. `TF_name`/`TFID`/`model_size`/`max_aff` are read from the same file and carried through unchanged. |
 
 ## Requirements
 
@@ -37,6 +38,15 @@ After regenerating either full table, rerun the corresponding slim preprocessor 
 Rscript scripts/utils/preprocess_oCRE_TFBS.R              # oCRE
 Rscript scripts/utils/preprocess_CRE_optimization_TFBS.R  # CRE optimization
 ```
+
+To refresh the background-affinity quantiles that seed `data/ParEndo_markerTF_cuttoffs.txt`:
+
+```bash
+export PROBOUND_JAR=/path/to/ProBound-jar-with-dependencies.jar
+Rscript scripts/probound_tfbs_mapping/get_affinity_random_sequences_Probound.R
+```
+
+This scores 1e6 random sequences per unique model size (fixed seed, so it's deterministic given the same ProBound jar/version) and overwrites `q99`/`q99p9`/`q99p99` in place; `TFID`/`model_size`/`max_aff` are untouched. `TFID`/`model_size` come from the ProBound Central motif models; `max_aff` is a separate empirical calibration constant (max observed affinity across curated maximal-tile DMS CRE sequences) that this script does not re-derive.
 
 ## Output schema
 
